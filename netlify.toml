@@ -1,0 +1,19 @@
+# ビルド不要の静的サイトです。フォルダをそのまま公開します。
+[build]
+  publish = "."
+
+# レシピデータとプログラムは更新がすぐ届くように、毎回新しいものを確認させます。
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*.md"
+  [headers.values]
+    X-Robots-Tag = "noindex"

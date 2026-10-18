@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>喫茶レシピキッチン</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+<!-- ホーム -->
+<section id="home" class="screen scroll">
+  <div id="baseBanner"></div>
+  <div class="hero">
+    <svg class="hero-art" viewBox="0 0 360 150" aria-hidden="true">
+      <defs><pattern id="tl" width="30" height="30" patternUnits="userSpaceOnUse"><rect width="30" height="30" fill="#cfe6ea"/><path d="M30 0V30M0 30H30" stroke="#b3d3d9" stroke-width="2"/></pattern></defs>
+      <rect width="360" height="150" fill="url(#tl)"/>
+      <rect y="104" width="360" height="46" fill="#e9b273"/><rect y="104" width="360" height="6" fill="#c98a48"/>
+      <g stroke="#3a2c25" stroke-width="3.5" stroke-linejoin="round">
+        <path d="M58 52h60v44q0 14-14 14H72q-14 0-14-14Z" fill="#fff"/>
+        <path d="M118 62h8q12 0 12 14t-12 14h-8" fill="none"/>
+        <path d="M63 58h50" stroke="#5b3520" stroke-width="7"/>
+        <path d="M76 44q-6-8 0-16M92 44q-6-8 0-16" fill="none" stroke-width="3" opacity=".5"/>
+        <path d="M168 40h44l-6 66q0 4-4 4h-24q-4 0-4-4Z" fill="#fff" fill-opacity=".7"/>
+        <path d="M171 66h38l-4 40h-30Z" fill="#45c05a" stroke="none"/>
+        <circle cx="190" cy="40" r="15" fill="#fff3d4"/>
+        <circle cx="208" cy="30" r="6" fill="#d94b37"/>
+        <path d="M250 70q0-16 16-16h46q16 0 16 16q0 8-6 10v26h-66V80q-6-2-6-10Z" fill="#f0c98a"/>
+        <path d="M262 78h52v22h-52Z" fill="#f7e2b8" stroke="none"/>
+        <path d="M270 86h36" stroke="#f0a91e" stroke-width="5"/>
+      </g>
+    </svg>
+    <div class="hero-txt">
+      <h1>喫茶レシピキッチン</h1>
+      <p id="heroCount">注文票どおりに材料を入れて、分量を手で覚えるゲームです。</p>
+    </div>
+  </div>
+
+  <div class="card prog" id="progCard"></div>
+
+  <div class="card mode">
+    <div>
+      <h3>営業モード</h3>
+      <p>注文が10品続けて入ります。制限時間内に作って提供してください。間違えやすいメニューほどよく出ます。</p>
+    </div>
+    <div class="tabs" id="rushCat">
+      <button data-cat="all" aria-pressed="true">すべて</button>
+      <button data-cat="drink" aria-pressed="false">ドリンク</button>
+      <button data-cat="food" aria-pressed="false">フード</button>
+    </div>
+    <button class="btn primary" data-act="rush">営業スタート</button>
+  </div>
+
+  <div class="mode-grid">
+    <button class="tile-btn" data-act="pick"><b>練習</b><span>メニューを選んで、ヒントを見ながら作ります</span></button>
+    <button class="tile-btn" data-act="pickSteps"><b>手順ならべ</b><span>組み立てや仕上げの順番を並べ替えます</span></button>
+    <button class="tile-btn" data-act="book"><b>レシピ帳</b><span>全メニューの材料と分量を一覧で確認できます</span></button>
+    <button class="tile-btn" data-act="admin"><b>レシピ編集</b><span>メニュー・材料・器の追加や修正ができます</span></button>
+  </div>
+  <p class="foot">記録と編集内容はこの端末のブラウザに保存されます。<br>同じメニューを3回連続で正解すると「覚えた」になります。</p>
+</section>
+
+<!-- メニュー選択 -->
+<section id="pick" class="screen" hidden>
+  <div class="topbar"><button class="back" data-act="home">‹ ホーム</button><h2 id="pickTitle">練習するメニュー</h2></div>
+  <div class="tabs" id="pickTabs"></div>
+  <div class="list" id="pickList"></div>
+</section>
+
+<!-- キッチン -->
+<section id="kitchen" class="screen" hidden>
+  <div class="kbar">
+    <button class="back" id="quitBtn">‹ 戻る</button>
+    <span class="sp"></span>
+    <span class="stat" id="kProg"></span>
+    <span class="stat" id="kScore"></span>
+  </div>
+  <div class="ticket">
+    <div class="t-top"><span id="tBadge" class="badge"></span><span id="tSub"></span></div>
+    <div class="t-name" id="tName"></div>
+    <div class="timer" id="timer"><i id="timerBar"></i></div>
+    <button class="hint-btn" id="hintBtn">ヒント</button>
+  </div>
+  <div class="hintbox" id="hintBox" hidden></div>
+  <div class="counter" id="counter">
+    <div class="vchoose" id="vChoose" hidden></div>
+    <div class="vessel" id="vessel"></div>
+    <div class="chips" id="chips"></div>
+  </div>
+  <div class="shelf" id="shelf"></div>
+  <div class="actions">
+    <button class="btn ghost" id="resetBtn">やり直す</button>
+    <button class="btn primary" id="serveBtn">提供する</button>
+  </div>
+</section>
+
+<!-- 手順ならべ -->
+<section id="steps" class="screen" hidden>
+  <div class="topbar"><button class="back" data-act="pickSteps">‹ 一覧</button><h2>手順ならべ</h2></div>
+  <div class="st-wrap" id="stWrap"></div>
+</section>
+
+<!-- レシピ帳 -->
+<section id="book" class="screen" hidden>
+  <div class="topbar"><button class="back" data-act="home">‹ ホーム</button><h2>レシピ帳</h2></div>
+  <input class="search" id="bookSearch" type="search" placeholder="メニュー名・材料で検索" autocomplete="off">
+  <div class="tabs" id="bookTabs" style="margin-top:8px"></div>
+  <div class="list" id="bookList"></div>
+</section>
+
+<!-- 営業結果 -->
+<section id="summary" class="screen scroll" hidden></section>
+
+<!-- レシピ編集トップ -->
+<section id="admin" class="screen" hidden>
+  <div class="topbar"><button class="back" data-act="home">‹ ホーム</button><h2>レシピ編集</h2></div>
+  <div class="tabs" id="admTabs">
+    <button data-atab="recipes" aria-pressed="true">レシピ</button>
+    <button data-atab="ings" aria-pressed="false">材料</button>
+    <button data-atab="vessels" aria-pressed="false">器</button>
+    <button data-atab="data" aria-pressed="false">データ</button>
+  </div>
+  <div class="adm-body" id="admBody"></div>
+</section>
+
+<!-- レシピの編集フォーム -->
+<section id="editRecipe" class="screen" hidden>
+  <div class="topbar"><button class="back" data-act="admin">‹ 戻る</button><h2 id="erTitle">レシピを編集</h2></div>
+  <form class="form" id="erForm" novalidate></form>
+</section>
+
+<!-- 材料の編集フォーム -->
+<section id="editIng" class="screen" hidden>
+  <div class="topbar"><button class="back" data-act="admin">‹ 戻る</button><h2 id="eiTitle">材料を編集</h2></div>
+  <form class="form" id="eiForm" novalidate></form>
+</section>
+</div>
+
+<!-- 計量シート -->
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-bg" id="sheetBg"></div>
+  <div class="sheet-card">
+    <div class="sh-head"><span id="shIcon"></span><b id="shName"></b><button class="x" id="shClose" aria-label="閉じる">×</button></div>
+    <label class="scale"><input id="shVal" inputmode="decimal" autocomplete="off" aria-label="分量"><span id="shUnit"></span></label>
+    <div class="sh-row">
+      <button class="btn round" id="shMinus">−</button>
+      <button class="btn pour" id="shPour">長押しで注ぐ</button>
+      <button class="btn round" id="shPlus">＋</button>
+    </div>
+    <div class="sh-tip" id="shTip"></div>
+    <div class="sh-row">
+      <button class="btn ghost" id="shZero">0にする</button>
+      <button class="btn primary" id="shOk">入れる</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal" hidden><div class="modal-card" id="modalCard"></div></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
