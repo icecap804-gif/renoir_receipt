@@ -1,8 +1,8 @@
 'use strict';
 /* =========================================================
-   喫茶レシピキッチン
+   ルノアール暗記用
    データ(メニュー・材料・器・切り方)は data.js の window.GAME_DATA。
-   アプリ内で編集した内容は、そのブラウザ(localStorage)に保存されます。
+   レシピを変えるときは data.js を書き換えてアップロードし直します。
    ========================================================= */
 
 /* ---------- 定数 ---------- */
@@ -10,44 +10,17 @@ const STORE_DATA = 'kissa-kitchen-data-v2';
 const STORE_STATS = 'kissa-recipe-kitchen-v1';
 const BASE = window.GAME_DATA;
 const CUT_TOL = 0.12;          // 切り方の判定のゆるさ(パンの一辺を1としたときのずれ)
-const MIX_TICKETS = 5;         // 伝票ラッシュの伝票の枚数
-const MAX_TRAY = 6;            // 伝票ラッシュで一度に作れる品の数
+const MIX_TICKETS = 5;         // 実践編の伝票の枚数
+const MAX_TRAY = 6;            // 実践編で一度に作れる品の数
 
-const CATS = [['drink', 'ドリンク'], ['food', 'フード']];
 const TABS = [['hot', 'HOT'], ['cold', 'ICE・その他'], ['food', 'フード']];
-const LOOKS = [['hot', 'HOT(ホットカップ)'], ['ice', 'ICE(アイスグラス)'], ['dish', 'デザート(デザート皿)']];
-const KINDS = {
-  drink: [['liq', '液体(層になって入る)'], ['pow', '粉・茶葉'], ['top', 'トッピング・氷・果物']],
-  food: [['layer', 'パンにのせる・はさむ'], ['side', '皿に添える']]
-};
-const VISES = {
-  liq: [['liquid', '液体']],
-  pow: [['powder', '粉(表面に散る)']],
-  top: [['whip', 'ホイップ'], ['scoop', 'アイス(丸いすくい)'], ['fruit', '果物のつぶ'], ['slice', '輪切り(ふちに飾る)'], ['ice', '氷'], ['pudding', 'プリン'], ['blob', 'その他(表面にのる)']],
-  layer: [['band', '平らな層'], ['bread', 'パン'], ['dots', '輪切りが並ぶ'], ['wave', '葉もの']],
-  side: [['soup', 'スープカップ'], ['egg', 'たまご'], ['bowl', '深皿'], ['cup', '小さなカップ'], ['scoop', 'アイス'], ['dish', '小皿']]
-};
-const SHAPES = [['pot', 'ポット'], ['bottle', 'ボトル'], ['carton', 'パック'], ['jar', 'びん'], ['shaker', 'ふりかけ'], ['tub', '容器'], ['round', '輪切り'], ['sheet', 'スライス'], ['cube', '氷'], ['ball', 'まるいもの'], ['can', '缶'], ['pudding', 'プリン'], ['bread', 'パン'], ['leaf', '葉'], ['egg', 'たまご'], ['pack', '袋']];
-const VSHAPES = [['rock', 'ロックグラス'], ['tumbler', 'タンブラー'], ['glass', '背の高いグラス'], ['mug', 'マグ'], ['jug', 'ジャグ']];
-
 /* ---------- データ ---------- */
 let DATA, ING, R, VESSELS;
-let DATA_EDITED = false, BASE_CHANGED = false;
 const clone = o => JSON.parse(JSON.stringify(o));
-function readSaved() { try { return JSON.parse(localStorage.getItem(STORE_DATA)); } catch (e) { return null; } }
-function writeSaved(obj) { try { localStorage.setItem(STORE_DATA, JSON.stringify(obj)); return true; } catch (e) { return false; } }
-function clearSaved() { try { localStorage.removeItem(STORE_DATA); } catch (e) { } }
-function useBase() { DATA = clone(BASE); DATA_EDITED = false; BASE_CHANGED = false; }
 function loadData() {
-  const saved = readSaved();
-  if (saved && saved.data && Array.isArray(saved.data.recipes)) { DATA = saved.data; DATA_EDITED = true; BASE_CHANGED = saved.baseVersion !== BASE.version; }
-  else useBase();
-  applyData();
-}
-function saveData() {
-  const ok = writeSaved({ baseVersion: BASE.version, savedAt: Date.now(), data: DATA });
-  DATA_EDITED = true; applyData();
-  if (!ok) toast('ブラウザに保存できませんでした。');
+  // 以前のバージョンの「レシピ編集」で保存された内容は使わない
+  try { localStorage.removeItem(STORE_DATA); localStorage.removeItem('kissa-kitchen-data-v1'); } catch (e) { }
+  DATA = clone(BASE); applyData();
 }
 function applyData() {
   ING = {};
@@ -69,7 +42,6 @@ const $ = s => document.querySelector(s);
 const rnd = v => Math.round(v * 100) / 100;
 const fx = v => String(rnd(v));
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
 const isOnce = k => !!(ING[k] && ING[k].once);
 function amtTxt(k, v) { const g = ING[k]; if (!g || isOnce(k) || v === null || v === undefined) return ''; if (Array.isArray(v)) return v[0] + '〜' + v[1] + g.unit; return fx(v) + g.unit; }
 function ingName(k) { return ING[k] ? ING[k].name : '(削除された材料)'; }
@@ -78,9 +50,7 @@ const tabOf = r => r.cat === 'food' ? 'food' : (r.look === 'hot' ? 'hot' : 'cold
 function badgeTxt(r) { return r.cat === 'food' ? 'フード' : r.look === 'hot' ? 'HOT' : r.look === 'dish' ? 'デザート' : 'ICE'; }
 const badge = r => `<span class="badge ${tabOf(r)}">${badgeTxt(r)}</span>`;
 const hasCut = r => !!(r && r.cat === 'food' && r.cut && r.cut.lines && r.cut.lines.length);
-function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 function show(id) { document.querySelectorAll('.screen').forEach(s => s.hidden = s.id !== id); window.scrollTo(0, 0); }
-function opts(list, cur) { return list.map(([v, l]) => `<option value="${esc(v)}"${v === cur ? ' selected' : ''}>${esc(l)}</option>`).join(''); }
 let toastT;
 function toast(msg) { document.querySelectorAll('.toast').forEach(t => t.remove()); const el = document.createElement('div'); el.className = 'toast'; el.textContent = msg; document.body.appendChild(el); clearTimeout(toastT); toastT = setTimeout(() => el.remove(), 2600); }
 function shelfGroups(cat) { const m = new Map(); for (const k in ING) { const g = ING[k]; if (g.cat !== cat) continue; if (!m.has(g.group)) m.set(g.group, []); m.get(g.group).push(k); } return [...m]; }
@@ -239,8 +209,23 @@ function clipLine(p, q) {
 }
 const dist = (p, q) => Math.hypot(p[0] - q[0], p[1] - q[1]);
 function lineDist(L, M) { return Math.min(Math.max(dist(L.a, M.a), dist(L.b, M.b)), Math.max(dist(L.a, M.b), dist(L.b, M.a))); }
-function judgeCuts(cut, got) {
-  const exp = cut.lines, used = new Set(); let missing = 0, typeErr = 0;
+// パンを90度回した線(向きを問わない切り方の判定に使う)
+const turnLine = l => ({ t: l.t, a: [1 - l.a[1], l.a[0]], b: [1 - l.b[1], l.b[0]] });
+function matchCuts(exp, got) {
+  const used = new Set(); let missing = 0, typeErr = 0;
+  exp.forEach(e => {
+    let best = -1, bd = CUT_TOL;
+    got.forEach((g, j) => { if (used.has(j)) return; const d = lineDist(e, g); if (d < bd) { bd = d; best = j; } });
+    if (best < 0) missing++; else { used.add(best); if (got[best].t !== e.t) typeErr++; }
+  });
+  return { missing, typeErr, extra: got.length - used.size };
+}
+// 回転・裏返しで同じ切り上がりになる線の入れ方は、すべて正解にする
+// (縦3等分と横3等分、右下がりと左下がりの対角線など)
+const CUT_SYMS = [p => p, ([x, y]) => [1 - x, y], ([x, y]) => [x, 1 - y], ([x, y]) => [1 - x, 1 - y],
+  ([x, y]) => [y, x], ([x, y]) => [1 - y, x], ([x, y]) => [y, 1 - x], ([x, y]) => [1 - y, 1 - x]];
+function judgeCutsOnce(exp, scoreFirst, got) {
+  const used = new Set(); let missing = 0, typeErr = 0;
   exp.forEach(e => {
     let best = -1, bd = CUT_TOL;
     got.forEach((g, j) => { if (used.has(j)) return; const d = lineDist(e, g); if (d < bd) { bd = d; best = j; } });
@@ -248,16 +233,27 @@ function judgeCuts(cut, got) {
   });
   const extra = got.length - used.size;
   let orderOk = true;
-  if (cut.scoreFirst) { const lastScore = got.map(g => g.t).lastIndexOf('score'); orderOk = !got.slice(0, Math.max(0, lastScore)).some(g => g.t === 'cut'); }
+  if (scoreFirst) { const lastScore = got.map(g => g.t).lastIndexOf('score'); orderOk = !got.slice(0, Math.max(0, lastScore)).some(g => g.t === 'cut'); }
+  return { missing, typeErr, extra, orderOk, errs: missing * 2 + typeErr + extra * 2 + (orderOk ? 0 : 1) };
+}
+function judgeCuts(cut, got) {
+  let best = null;
+  for (const T of CUT_SYMS) {
+    const exp = cut.lines.map(l => ({ t: l.t, a: T(l.a), b: T(l.b) }));
+    const r = judgeCutsOnce(exp, cut.scoreFirst, got); r.lines = exp;
+    if (!best || r.errs < best.errs) best = r;
+    if (r.errs === 0) break;
+  }
   const msgs = [];
   if (!got.length) msgs.push('まだ切っていません。');
   else {
-    if (missing) msgs.push(`位置が違う・足りない線:${missing}本`);
-    if (typeErr) msgs.push(`切込み(点線)とカット(実線)が逆:${typeErr}本`);
-    if (extra) msgs.push(`余分な線:${extra}本`);
-    if (!orderOk) msgs.push('切込みを入れ終わる前にカットしています。');
+    if (best.missing) msgs.push(`位置が違う・足りない線:${best.missing}本`);
+    if (best.typeErr) msgs.push(`切込み(点線)とカット(実線)が逆:${best.typeErr}本`);
+    if (best.extra) msgs.push(`余分な線:${best.extra}本`);
+    if (!best.orderOk) msgs.push('切込みを入れ終わる前にカットしています。');
   }
-  return { ok: got.length > 0 && !missing && !typeErr && !extra && orderOk, msgs };
+  // 正解の図は、あなたの切り方にいちばん近い向きで表示する
+  return { ok: got.length > 0 && best.errs === 0, msgs, lines: got.length ? best.lines : cut.lines };
 }
 function breadOf(r, b) { const items = r ? r.items : (b ? b.added : {}); return 'breadS' in items && !('breadT' in items) ? 'sand' : 'toast'; }
 function boardSVG(lines, o) {
@@ -289,13 +285,14 @@ function attachSwipe(svg, getTool, onLine, redraw, snap) {
 /* =========================================================
    状態
    ========================================================= */
-const S = { mode: 'practice', queue: [], idx: 0, total: 0, score: 0, log: [], recipe: null, build: null, tEnd: 0, limit: 0, raf: 0, pickTab: 'hot', rushCat: 'all', hint: false, group: {}, tool: 'score', picking: false };
-const X = { tickets: [], ti: 0, made: [], table: 1 };   // 伝票ラッシュ
+const S = { mode: 'rush', queue: [], idx: 0, total: 0, score: 0, log: [], recipe: null, build: null, tEnd: 0, limit: 0, raf: 0, rushCat: 'all', group: {}, tool: 'cut', picking: false };
+const X = { tickets: [], ti: 0, made: [], table: 1 };   // 実践編
 
 /* ---------- キッチンの描画 ---------- */
 function binHTML(k) { const g = ING[k], b = S.build; return `<button type="button" class="bin${b && b.added[k] > 0 ? ' on' : ''}" data-ing="${k}" style="--c:${esc(g.color)}">${icoOf(g)}<span>${esc(g.name)}</span></button>`; }
 function renderShelf() {
   const b = S.build, el = $('#shelf');
+  el.hidden = S.mode === 'mix' && (!b || S.picking);
   if (!b || !b.cont || S.picking) { el.innerHTML = `<p class="shelf-empty">${S.mode === 'mix' ? '作る品の器かお皿を選ぶと、ここに材料が並びます。' : '先に器を選んでください。'}</p>`; return; }
   const cat = contCat(b.cont), groups = shelfGroups(cat);
   if (!groups.length) { el.innerHTML = '<p class="shelf-empty">この棚には材料がありません。</p>'; return; }
@@ -314,7 +311,7 @@ function renderChips() {
 function canCut(b) { return b && b.cont === 'plate' && (S.mode === 'mix' || hasCut(S.recipe)); }
 function renderCounter(pop) {
   const b = S.build, box = $('#vessel'), r = S.recipe;
-  // 器の選択(伝票ラッシュ:新しい品/器を変える)
+  // 器の選択(実践編:新しい品/器を変える)
   const picking = S.mode === 'mix' && (!b || S.picking);
   $('#contPick').hidden = !picking;
   if (picking) {
@@ -354,16 +351,10 @@ function renderTray() {
   el.innerHTML = X.made.map((b, i) => `<button data-tray="${i}" aria-pressed="${S.build === b && !S.picking}">${buildSVG(b, 't' + i)}<span>${esc(contName(b.cont))}</span></button>`).join('')
     + (X.made.length < MAX_TRAY ? `<button class="add" data-act="newItem" aria-pressed="${S.picking && !S.build}"><b>＋</b>新しく作る</button>` : '');
 }
-function renderHint() {
-  const r = S.recipe, box = $('#hintBox');
-  box.hidden = !S.hint || !r;
-  if (box.hidden) return;
-  box.innerHTML = `<b>レシピ</b>:${r.vessel ? `器は${esc(r.vessel)}。` : ''}${esc(recipeLine(r))}${r.note ? `<br>${esc(r.note)}` : ''}`
-    + (hasCut(r) ? `<div class="hint-cut">${boardSVG(r.cut.lines, { bread: breadOf(r), numbers: r.cut.scoreFirst })}<span>切り方:点線が切込み、実線がカットです。${r.cut.scoreFirst ? '切込みを全部入れてからカットします。' : ''}</span></div>` : '');
-}
 function renderTicket() {
   const mix = S.mode === 'mix', r = S.recipe, b = $('#tBadge');
   $('#tList').hidden = !mix;
+  $('#kitchen').classList.toggle('mix', mix);
   if (mix) {
     const t = X.tickets[X.ti];
     b.className = 'badge'; b.textContent = `テーブル ${X.table}`;
@@ -375,24 +366,23 @@ function renderTicket() {
     $('#tName').hidden = false;
     b.className = 'badge ' + tabOf(r); b.textContent = badgeTxt(r);
     $('#tName').textContent = r.name;
-    $('#tSub').textContent = S.mode === 'rush' ? `ご注文 ${S.idx + 1}/${S.total}` : '練習';
-    $('#kProg').textContent = S.mode === 'rush' ? `${S.idx + 1}/${S.total}` : LV[level(r.id)];
+    $('#tSub').textContent = `ご注文 ${S.idx + 1}/${S.total}`;
+    $('#kProg').textContent = `${S.idx + 1}/${S.total}`;
   }
-  const timed = S.mode !== 'practice';
-  $('#kScore').hidden = !timed; $('#kScore').textContent = `${S.score}点`;
-  $('#timer').hidden = !timed; $('#hintBtn').hidden = S.mode !== 'practice';
+  $('#kScore').textContent = `${S.score}点`;
   $('#resetBtn').textContent = mix ? 'この品を捨てる' : 'やり直す';
   $('#serveBtn').textContent = mix ? '伝票ごと提供する' : '提供する';
   $('#quitBtn').textContent = '‹ 戻る'; $('#quitBtn').dataset.armed = '';
 }
-function renderKitchen() { renderTicket(); renderHint(); renderTray(); renderCounter(); renderShelf(); }
+function renderKitchen() { renderTicket(); renderTray(); renderCounter(); renderShelf(); }
 
-/* ---------- 1品ずつのモード(練習・営業) ---------- */
+/* ---------- 練習(1品ずつ) ---------- */
 function startOrder(r) {
-  S.recipe = r; S.hint = false; S.picking = false;
+  S.tool = 'cut';
+  S.recipe = r; S.picking = false;
   S.build = newBuild(r.vessel && r.cat !== 'food' && r.look !== 'dish' ? null : expectedCont(r));
-  renderKitchen(); show('kitchen');
-  if (S.mode === 'rush') startTimer(r.cat === 'food' ? 90 : 60);
+  renderKitchen(); show('kitchen'); $('#kitchen').scrollTop = 0;
+  startTimer(r.cat === 'food' ? 90 : 60);
 }
 function startTimer(sec) {
   cancelAnimationFrame(S.raf); S.limit = sec; S.tEnd = performance.now() + sec * 1000;
@@ -469,7 +459,7 @@ function resultDetail(r, b, res) {
   if (res.needCont) rows = `<tr class="${res.contOk ? 'good' : 'bad'}"><td class="m">${res.contOk ? '○' : '×'}</td><td>器</td><td class="ans">${esc(contName(expectedCont(r)))}</td><td class="you">${esc(b.cont ? contName(b.cont) : '—')}</td></tr>` + rows;
   if (res.cut) rows += `<tr class="${res.cut.ok ? 'good' : 'bad'}"><td class="m">${res.cut.ok ? '○' : '×'}</td><td>切り方</td><td class="ans" colspan="2">${res.cut.ok ? '正しく切れています' : '下の図を確認'}</td></tr>`;
   let html = `<table class="rtable"><thead><tr><th></th><th>材料</th><th>正解</th><th>あなた</th></tr></thead><tbody>${rows}</tbody></table>`;
-  if (res.cut) html += `${res.cut.msgs.length ? `<p class="cutmsg">${res.cut.msgs.map(esc).join('<br>')}</p>` : ''}<div class="cutpair"><figure>${boardSVG(r.cut.lines, { bread: breadOf(r), numbers: r.cut.scoreFirst })}<figcaption>正解</figcaption></figure><figure>${boardSVG(b.cuts, { bread: breadOf(r), numbers: r.cut.scoreFirst, color: res.cut.ok ? '#36985a' : '#d94b37' })}<figcaption>あなた</figcaption></figure></div>`;
+  if (res.cut) html += `${res.cut.msgs.length ? `<p class="cutmsg">${res.cut.msgs.map(esc).join('<br>')}</p>` : ''}<div class="cutpair"><figure>${boardSVG(res.cut.lines, { bread: breadOf(r), numbers: r.cut.scoreFirst })}<figcaption>正解</figcaption></figure><figure>${boardSVG(b.cuts, { bread: breadOf(r), numbers: r.cut.scoreFirst, color: res.cut.ok ? '#36985a' : '#d94b37' })}<figcaption>あなた</figcaption></figure></div>`;
   return html;
 }
 function serve(auto) {
@@ -478,17 +468,12 @@ function serve(auto) {
   stopTimer(); closeSheet();
   const r = S.recipe, b = S.build, res = judgeBuild(r, b, false);
   record(r.id, res.ok);
-  let pts = 0;
-  if (S.mode === 'rush') {
-    const left = Math.max(0, (S.tEnd - performance.now()) / 1000);
-    pts = res.ok ? 100 + Math.ceil(left) * 2 : Math.round(res.good / Math.max(1, res.total) * 40);
-    S.score += pts; S.log.push({ r, ok: res.ok, pts });
-  }
-  const rush = S.mode === 'rush', last = rush && S.idx >= S.total - 1;
-  const btns = rush ? `<button class="btn primary" data-act="next">${last ? '結果を見る' : '次の注文へ'}</button>`
-    : `<button class="btn ghost" data-act="retry">もう一度</button><button class="btn ghost" data-act="pick">一覧へ</button><button class="btn primary" data-act="next">次のメニュー</button>`;
-  openResult(res.ok, res.ok ? '完璧です！' : auto ? '時間切れです' : '惜しいです', res.ok ? `${r.name}を正しく作れました。` : '赤字のところを確認してください。', rush ? pts : null,
-    resultDetail(r, b, res) + (r.note ? `<div class="note">${esc(r.note)}</div>` : ''), btns);
+  const left = Math.max(0, (S.tEnd - performance.now()) / 1000);
+  const pts = res.ok ? 100 + Math.ceil(left) * 2 : Math.round(res.good / Math.max(1, res.total) * 40);
+  S.score += pts; S.log.push({ r, ok: res.ok, pts });
+  const last = S.idx >= S.total - 1;
+  openResult(res.ok, res.ok ? '完璧です！' : auto ? '時間切れです' : '惜しいです', res.ok ? `${r.name}を正しく作れました。` : '赤字のところを確認してください。', pts,
+    resultDetail(r, b, res) + (r.note ? `<div class="note">${esc(r.note)}</div>` : ''), `<button class="btn primary" data-act="next">${last ? '結果を見る' : '次の注文へ'}</button>`);
 }
 function openResult(ok, title, sub, pts, body, btns) {
   $('#modalCard').innerHTML = `<div class="verdict"><div class="stamp ${ok ? 'ok' : 'ng'}">${ok ? '◎' : '△'}</div><div><h3>${title}</h3><p>${esc(sub)}${pts !== null ? ` <span class="pts">+${pts}点</span>` : ''}</p></div></div>${body}<div class="modal-btns">${btns}</div>`;
@@ -497,10 +482,7 @@ function openResult(ok, title, sub, pts, body, btns) {
 function nextOrder() {
   $('#modal').hidden = true;
   if (S.mode === 'mix') { X.ti++; if (X.ti >= X.tickets.length) { showSummary(); return; } startTicket(); return; }
-  if (S.mode === 'rush') { S.idx++; if (S.idx >= S.total) { showSummary(); return; } startOrder(S.queue[S.idx]); return; }
-  let r = S.queue.shift();
-  if (!r) { const pool = R.filter(x => tabOf(x) === S.pickTab && x.id !== S.recipe.id); r = weighted(pool.length ? pool : [S.recipe], 1)[0]; }
-  startOrder(r);
+  S.idx++; if (S.idx >= S.total) { showSummary(); return; } startOrder(S.queue[S.idx]);
 }
 function startRush() {
   const pool = R.filter(r => S.rushCat === 'all' || r.cat === S.rushCat);
@@ -509,7 +491,7 @@ function startRush() {
   startOrder(S.queue[0]);
 }
 
-/* ---------- 伝票ラッシュ ---------- */
+/* ---------- 実践編 ---------- */
 function startMix() {
   if (!R.length) { toast('メニューがありません'); return; }
   S.mode = 'mix'; S.score = 0; S.log = []; S.recipe = null;
@@ -526,7 +508,7 @@ function startMix() {
 function startTicket() {
   X.made = []; X.table = 1 + Math.floor(Math.random() * 12);
   S.build = null; S.picking = true;
-  renderKitchen(); show('kitchen');
+  renderKitchen(); show('kitchen'); $('#kitchen').scrollTop = 0;
   startTimer(X.tickets[X.ti].reduce((a, r) => a + (r.cat === 'food' ? 80 : 45), 0));
 }
 function selectTray(i) { S.build = X.made[i]; S.picking = false; renderTray(); renderCounter(); renderShelf(); }
@@ -537,7 +519,7 @@ function pickCont(id) {
     b.cont = id;
   } else {
     if (X.made.length >= MAX_TRAY) return;
-    S.build = newBuild(id); X.made.push(S.build);
+    S.build = newBuild(id); X.made.push(S.build); S.tool = 'cut';
   }
   S.picking = false; renderTray(); renderCounter(true); renderShelf();
 }
@@ -572,52 +554,18 @@ function serveMix(auto) {
 function showSummary() {
   const ok = S.log.filter(x => x.ok).length;
   $('#summary').innerHTML = `<div class="card" style="display:grid;gap:14px">
-    <div style="text-align:center"><div class="st-sub">本日の営業結果</div><div class="big">${S.score}</div><div class="st-sub">点 ・ 正解 ${ok}/${S.log.length}品</div></div>
+    <div style="text-align:center"><div class="st-sub">${S.mode === 'mix' ? '実践編' : '練習'}の結果</div><div class="big">${S.score}</div><div class="st-sub">点 ・ 正解 ${ok}/${S.log.length}品</div></div>
     <div class="sum-list">${S.log.map(x => `<div><b style="color:var(--${x.ok ? 'ok' : 'ng'})">${x.ok ? '○' : '×'}</b><span>${esc(x.r.name)}</span><i>+${x.pts}</i></div>`).join('')}</div>
     <div class="modal-btns">
-      ${ok < S.log.length ? `<button class="btn ghost" data-act="practiceMiss">まちがえた品を練習</button>` : ''}
       <button class="btn primary" data-act="${S.mode === 'mix' ? 'mix' : 'rush'}">もう一度</button>
     </div>
     <button class="btn ghost" data-act="home">ホームへ</button></div>`;
   show('summary');
 }
 
-/* ---------- メニュー選択 ---------- */
-let pickSteps = false;
-function renderTabs(el, cur, attr) { el.innerHTML = TABS.map(([k, l]) => `<button data-${attr}="${k}" aria-pressed="${k === cur}">${l}</button>`).join(''); }
-function openPick(steps) {
-  pickSteps = steps; $('#modal').hidden = true;
-  $('#pickTitle').textContent = steps ? '手順ならべ' : '練習するメニュー';
-  $('#pickTabs').hidden = steps;
-  renderTabs($('#pickTabs'), S.pickTab, 'ptab');
-  const list = steps ? R.filter(r => r.steps && r.steps.length > 1) : R.filter(r => tabOf(r) === S.pickTab);
-  $('#pickList').innerHTML = list.length ? list.map(r => `<button class="row" data-pick="${esc(r.id)}"><span class="nm">${esc(r.name)}${steps ? `<small>${esc(r.stepsTitle || '手順')}・${r.steps.length}ステップ</small>` : hasCut(r) ? '<small>切り方あり</small>' : ''}</span>${steps ? '' : lvTag(r.id)}</button>`).join('')
-    : `<p class="foot">${steps ? '手順が登録されたメニューはまだありません。「レシピ編集」で手順を追加できます。' : 'このタブにはメニューがありません。'}</p>`;
-  show('pick');
-}
-
-/* ---------- 手順ならべ ---------- */
-const T = { r: null, pool: [], picked: [], checked: false };
-function startSteps(r) { T.r = r; T.pool = shuffle(r.steps.map((_, i) => i)); T.picked = []; T.checked = false; renderSteps(); show('steps'); }
-function renderSteps() {
-  const r = T.r;
-  const slots = r.steps.map((_, i) => {
-    const p = T.picked[i];
-    if (p === undefined) return `<div class="slot"></div>`;
-    const cls = T.checked ? (r.steps[p] === r.steps[i] ? 'good' : 'bad') : '';
-    return `<button class="slot filled ${cls}" data-unpick="${i}" ${T.checked ? 'disabled' : ''}><span>${esc(r.steps[p])}${T.checked && r.steps[p] !== r.steps[i] ? `<span class="fix">正しくは:${esc(r.steps[i])}</span>` : ''}</span></button>`;
-  }).join('');
-  const pool = T.pool.filter(i => !T.picked.includes(i)).map(i => `<button class="pcard" data-put="${i}">${esc(r.steps[i])}</button>`).join('');
-  const all = T.picked.length === r.steps.length;
-  const okN = T.picked.filter((p, i) => r.steps[p] === r.steps[i]).length;
-  $('#stWrap').innerHTML = `<div><h3 class="st-title">${esc(r.name)}</h3><p class="st-sub">${esc(r.stepsTitle || '手順')}。下のカードを正しい順番にタップしてください。</p></div>
-    <div class="slots">${slots}</div>
-    ${T.checked ? `<div class="note"><b>${okN}/${r.steps.length}</b> 正解です。${r.note ? esc(r.note) : ''}</div><div class="modal-btns"><button class="btn ghost" data-act="pickSteps">一覧へ</button><button class="btn primary" data-act="stepsRetry">もう一度</button></div>`
-      : all ? `<button class="btn primary" data-act="stepsCheck">答え合わせ</button>` : `<div class="pool">${pool}</div>`}`;
-}
-
 /* ---------- レシピ帳 ---------- */
 let bookTab = 'hot';
+function renderTabs(el, cur, attr) { el.innerHTML = TABS.map(([k, l]) => `<button data-${attr}="${k}" aria-pressed="${k === cur}">${l}</button>`).join(''); }
 function renderBook() {
   renderTabs($('#bookTabs'), bookTab, 'btab');
   const q = $('#bookSearch').value.trim();
@@ -625,244 +573,15 @@ function renderBook() {
   $('#bookTabs').style.opacity = q ? '.4' : '1';
   $('#bookList').innerHTML = list.length ? list.map(r => `<div class="bcard"><div class="bhead">${badge(r)}<b>${esc(r.name)}</b>${lvTag(r.id)}</div>
     <ul class="ings">${r.vessel ? `<li><span>器</span><i>${esc(r.vessel)}</i></li>` : ''}${Object.entries(r.items).map(([k, v]) => `<li><span>${esc(ingName(k))}</span><i>${esc(amtTxt(k, v)) || '○'}</i></li>`).join('')}</ul>
-    ${hasCut(r) ? `<div class="hint-cut">${boardSVG(r.cut.lines, { bread: breadOf(r), numbers: r.cut.scoreFirst, cls: 'bcut' })}<span class="bnote">点線:切込み<br>実線:カット${r.cut.scoreFirst ? '<br>切込みを全部入れてからカット' : ''}</span></div>` : ''}
+    ${hasCut(r) ? `<div class="hint-cut">${boardSVG(r.cut.lines, { bread: breadOf(r), numbers: r.cut.scoreFirst, cls: 'bcut' })}<span class="bnote">点線:切込み<br>実線:カット${r.cut.scoreFirst ? '<br>切込みを全部入れてからカット' : ''}${r.cut.anyTurn ? '<br>向きは問わない' : ''}</span></div>` : ''}
     ${r.steps && r.steps.length ? `<div class="st-sub" style="font-weight:800">${esc(r.stepsTitle || '手順')}</div><ol>${r.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>` : ''}
     ${r.note ? `<p class="bnote">${esc(r.note)}</p>` : ''}</div>`).join('') : `<p class="foot">${q ? `「${esc(q)}」に当てはまるメニューはありません。` : 'このタブにはメニューがありません。'}</p>`;
 }
 
 /* ---------- ホーム ---------- */
 function renderHome() {
-  const nd = R.filter(r => r.cat === 'drink').length, nf = R.filter(r => r.cat === 'food').length;
-  $('#heroCount').textContent = `注文票どおりに材料を入れて、分量と切り方を手で覚えるゲームです。ドリンク${nd}品・フード${nf}品を収録しています。`;
-  const rows = TABS.map(([k, l]) => { const list = R.filter(r => tabOf(r) === k); const n = list.filter(r => level(r.id) === 2).length; return `<div class="prog-row"><span>${l}</span><div class="bar"><i style="width:${list.length ? n / list.length * 100 : 0}%"></i></div><b>${n}/${list.length}</b></div>`; }).join('');
-  const all = R.filter(r => level(r.id) === 2).length;
-  $('#progCard').innerHTML = `<div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font-size:16px">覚えたメニュー</b><span style="font-family:var(--f-dig);font-size:20px">${all}/${R.length}</span></div>${rows}`;
   document.querySelectorAll('#rushCat button').forEach(b => b.setAttribute('aria-pressed', b.dataset.cat === S.rushCat));
-  $('#baseBanner').innerHTML = BASE_CHANGED ? `<div class="banner"><div><b>新しいレシピデータがあります。</b><br>このブラウザには、以前に「レシピ編集」で変えた内容が残っているため、そちらを表示しています。</div>
-    <div class="modal-btns"><button class="btn primary" data-act="useBase">新しいデータに切り替える</button><button class="btn ghost" data-act="keepLocal">今の内容を使い続ける</button></div></div>` : '';
   show('home');
-}
-
-/* =========================================================
-   レシピ編集
-   ========================================================= */
-let admTab = 'recipes', admRecipeTab = 'hot', admIngCat = 'drink';
-function openAdmin(tab) {
-  if (tab) admTab = tab;
-  document.querySelectorAll('#admTabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.atab === admTab));
-  ({ recipes: admRecipes, ings: admIngs, vessels: admVessels })[admTab]();
-  show('admin');
-}
-const usedBy = k => R.filter(r => k in r.items);
-function admRecipes() {
-  const list = R.filter(r => tabOf(r) === admRecipeTab);
-  $('#admBody').innerHTML = `<div class="adm-tools"><button class="btn primary" data-act="newRecipe">＋ 新しいレシピ</button></div>
-    <div class="tabs">${TABS.map(([k, l]) => `<button data-artab="${k}" aria-pressed="${k === admRecipeTab}">${l}</button>`).join('')}</div>
-    ${list.length ? list.map(r => `<button class="row" data-edit-recipe="${esc(r.id)}"><span class="nm">${esc(r.name)}<small>${esc(recipeLine(r))}${hasCut(r) ? ' ・切り方あり' : ''}</small></span><span class="lv lv0">編集</span></button>`).join('') : `<p class="foot">このタブにはまだメニューがありません。</p>`}`;
-}
-function admIngs() {
-  $('#admBody').innerHTML = `<div class="adm-tools"><button class="btn primary" data-act="newIng">＋ 新しい材料</button></div>
-    <div class="tabs">${CATS.map(([k, l]) => `<button data-aicat="${k}" aria-pressed="${k === admIngCat}">${l}の棚</button>`).join('')}</div>
-    ${shelfGroups(admIngCat).map(([h, ks]) => `<div class="group-h">${esc(h)}</div>${ks.map(k => { const g = ING[k], n = usedBy(k).length; return `<button class="row" data-edit-ing="${esc(k)}"><span class="ico">${icoOf(g)}</span><span class="nm">${esc(g.name)}<small>${g.once ? '量を指定しない' : `1タップ ${fx(g.step)}${esc(g.unit)}`}・${n}品で使用</small></span><span class="lv lv0">編集</span></button>`; }).join('')}`).join('')}`;
-}
-let VW = [];
-function admVessels() { VW = VESSELS.map(v => ({ name: v.name, shape: v.shape, orig: v.name })); renderVesselForm(); }
-function renderVesselForm(err) {
-  $('#admBody').innerHTML = `<p class="bnote">ここで登録した器は、レシピで「器」を指定したときに使います。器を指定しないドリンクは、HOTならホットカップ、ICEならアイスグラスになります。伝票ラッシュでは、ここの器も選択肢に並びます。</p>
-    ${VW.map((v, i) => `<div class="vrow"><input class="in" data-vname="${i}" value="${esc(v.name)}" placeholder="器の名前" aria-label="器の名前"><select class="in" data-vshape="${i}" aria-label="形">${opts(VSHAPES, v.shape)}</select><button type="button" class="del" data-vdel="${i}" aria-label="削除">×</button></div>`).join('')}
-    <div class="adm-tools"><button class="btn ghost" data-act="addVessel">＋ 器を追加</button></div>
-    <div class="err">${esc(err || '')}</div>
-    <button class="btn primary" data-act="saveVessels">器を保存</button>`;
-}
-function saveVessels() {
-  const names = VW.map(v => v.name.trim());
-  if (names.some(n => !n)) return renderVesselForm('名前が空の器があります。');
-  if (new Set(names).size !== names.length) return renderVesselForm('同じ名前の器が2つあります。');
-  if (names.some(n => ['ホットカップ', 'アイスグラス', 'デザート皿', 'フード皿'].includes(n))) return renderVesselForm('ホットカップ・アイスグラス・デザート皿・フード皿は最初からあるので、別の名前にしてください。');
-  for (const v of VESSELS) {
-    if (!VW.find(w => w.orig === v.name)) { const u = R.filter(r => r.vessel === v.name); if (u.length) return renderVesselForm(`「${v.name}」は ${u.map(r => r.name).join('、')} で使われているため削除できません。先にレシピの器を変えてください。`); }
-  }
-  VW.forEach(w => { if (w.orig && w.orig !== w.name.trim()) R.forEach(r => { if (r.vessel === w.orig) r.vessel = w.name.trim(); }); });
-  DATA.vessels = VW.map(w => ({ name: w.name.trim(), shape: w.shape }));
-  saveData(); toast('器を保存しました'); admVessels();
-}
-
-/* --- レシピの編集フォーム --- */
-let ER = null;
-const emptyRow = () => ({ k: '', mode: 'amt', a: '', b: '' });
-function itemsToRows(items) { return Object.entries(items).map(([k, v]) => v === null || isOnce(k) ? { k, mode: 'once', a: '', b: '' } : Array.isArray(v) ? { k, mode: 'range', a: v[0], b: v[1] } : { k, mode: 'amt', a: v, b: '' }); }
-function openRecipeEditor(r, copyOf) {
-  const base = r ? clone(r) : { id: '', name: '', cat: admRecipeTab === 'food' ? 'food' : 'drink', look: admRecipeTab === 'hot' ? 'hot' : admRecipeTab === 'food' ? 'food' : 'ice', items: {} };
-  ER = { origId: r && !copyOf ? r.id : null, r: base, rows: itemsToRows(base.items), cutOn: !!(base.cut && base.cut.lines && base.cut.lines.length), cut: base.cut ? clone(base.cut) : { lines: [], scoreFirst: false }, tool: 'score' };
-  if (copyOf) ER.r.name += '(コピー)';
-  if (!ER.rows.length) ER.rows.push(emptyRow());
-  $('#erTitle').textContent = ER.origId ? 'レシピを編集' : '新しいレシピ';
-  renderRecipeForm(); show('editRecipe');
-}
-function ingSelect(cat, cur, i) {
-  return `<select class="in" data-rk="${i}" aria-label="材料"><option value="">材料を選ぶ</option>${shelfGroups(cat).map(([h, ks]) => `<optgroup label="${esc(h)}">${ks.map(k => `<option value="${esc(k)}"${k === cur ? ' selected' : ''}>${esc(ING[k].name)}</option>`).join('')}</optgroup>`).join('')}</select>`;
-}
-function rowHTML(row, i) {
-  const once = row.k && isOnce(row.k); if (once) row.mode = 'once';
-  const u = row.k && ING[row.k] ? esc(ING[row.k].unit) : '';
-  const num = (attr, v) => `<input class="in" type="number" step="any" min="0" inputmode="decimal" data-${attr}="${i}" value="${esc(v)}">`;
-  const amts = row.mode === 'amt' ? `<span>分量</span>${num('ra', row.a)}<span>${u}</span>`
-    : row.mode === 'range' ? `${num('ra', row.a)}<span>〜</span>${num('rb', row.b)}<span>${u}</span>`
-      : `<span>${once ? 'この材料は量を指定しません(入っていれば正解)' : '入っていれば正解(量は問わない)'}</span>`;
-  return `<div class="irow">${ingSelect(ER.r.cat, row.k, i)}<select class="in" data-rm="${i}" aria-label="判定のしかた" ${once ? 'disabled' : ''}>${opts([['amt', '分量'], ['range', '範囲'], ['once', '入れるだけ']], row.mode)}</select><button type="button" class="del" data-rdel="${i}" aria-label="この材料を外す">×</button><div class="amts">${amts}</div></div>`;
-}
-function renderRows() { $('#erRows').innerHTML = ER.rows.map(rowHTML).join(''); }
-function renderRecipeForm() {
-  const r = ER.r, food = r.cat === 'food';
-  $('#erForm').innerHTML = `
-    <div class="fld"><label for="erName">メニュー名</label><input class="in" id="erName" value="${esc(r.name)}" placeholder="例:キャラメルラテ"></div>
-    <div class="two">
-      <div class="fld"><label for="erCat">種類</label><select class="in" id="erCat">${opts(CATS, r.cat)}</select></div>
-      ${food ? '<div></div>' : `<div class="fld"><label for="erLook">表示</label><select class="in" id="erLook">${opts(LOOKS, r.look)}</select></div>`}
-    </div>
-    ${food ? '' : `<div class="fld"><label for="erVessel">器</label><select class="in" id="erVessel">${opts([['', '指定しない(HOT/ICEに合わせる)']].concat(VESSELS.map(v => [v.name, v.name])), r.vessel || '')}</select><small>器を指定すると、器を選ぶ問題が出ます。</small></div>`}
-    <div class="fld"><span class="lbl">材料と分量</span><div class="irows" id="erRows"></div>
-      <div class="adm-tools"><button type="button" class="btn ghost" data-act="addRow">＋ 材料を追加</button></div>
-      <small>棚にない材料は、先に「材料」タブで追加してください。トッピングと粉は量を指定しません。</small></div>
-    ${food ? `<div class="fld"><span class="lbl">切り方</span>
-      <label class="check"><input type="checkbox" id="erCutOn" ${ER.cutOn ? 'checked' : ''}><span>切り方を出題する<small>パンを上から見た図を、指でなぞって線を引きます。</small></span></label>
-      <div id="erCutBox" style="display:grid;gap:8px" ${ER.cutOn ? '' : 'hidden'}>
-        <div class="cuttools">
-          <button type="button" data-etool="score" aria-pressed="${ER.tool === 'score'}"><svg viewBox="0 0 40 10" aria-hidden="true"><path d="M2 5H38" stroke="currentColor" stroke-width="4" stroke-dasharray="2 6" stroke-linecap="round"/></svg>切込み</button>
-          <button type="button" data-etool="cut" aria-pressed="${ER.tool === 'cut'}"><svg viewBox="0 0 40 10" aria-hidden="true"><path d="M2 5H38" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>カット</button>
-          <button type="button" data-act="eCutUndo">1本戻す</button><button type="button" data-act="eCutClear">全部消す</button>
-        </div>
-        <div class="board-edit" id="erBoard"></div>
-        <small id="erCutInfo"></small>
-        <label class="check"><input type="checkbox" id="erScoreFirst" ${ER.cut.scoreFirst ? 'checked' : ''}><span>切込みをすべて入れてからカットする<small>オンにすると、切る順番も判定します。</small></span></label>
-      </div></div>` : ''}
-    <div class="fld"><label for="erNote">メモ(結果画面とヒントに表示)</label><textarea class="in" id="erNote" placeholder="例:最後に抹茶粉をふりかける">${esc(r.note || '')}</textarea></div>
-    <div class="fld"><label for="erStepsTitle">手順の見出し</label><input class="in" id="erStepsTitle" value="${esc(r.stepsTitle || '')}" placeholder="例:作り方の順番"></div>
-    <div class="fld"><label for="erSteps">手順(1行に1つ。2行以上あると「手順ならべ」に出ます)</label><textarea class="in" id="erSteps" style="min-height:120px">${esc((r.steps || []).join('\n'))}</textarea></div>
-    <div class="err" id="erErr"></div>
-    <div class="form-btns">
-      <button type="button" class="btn primary" data-act="saveRecipe">保存</button>
-      ${ER.origId ? `<button type="button" class="btn ghost" data-act="copyRecipe">複製</button><button type="button" class="btn danger" data-act="deleteRecipe">削除</button>` : ''}
-    </div>`;
-  renderRows();
-  if (food) renderEditBoard();
-}
-function renderEditBoard(prev) {
-  const box = $('#erBoard'); if (!box) return;
-  const bread = 'breadS' in Object.fromEntries(ER.rows.filter(x => x.k).map(x => [x.k, 1])) ? 'sand' : 'toast';
-  box.innerHTML = boardSVG(ER.cut.lines, { bread, numbers: true, preview: prev });
-  const n = t => ER.cut.lines.filter(l => l.t === t).length;
-  $('#erCutInfo').textContent = ER.cut.lines.length ? `切込み ${n('score')}本・カット ${n('cut')}本。線はパンの端から端まで引かれます。` : 'パンの上を指でなぞって線を引いてください。';
-  if (!prev) attachSwipe(box.querySelector('svg'), () => ER.tool, l => { ER.cut.lines.push(l); renderEditBoard(); }, p => { const svg = box.querySelector('svg'); const s = boardSVG(ER.cut.lines, { bread, numbers: true, preview: p }); svg.innerHTML = s.slice(s.indexOf('>') + 1, s.lastIndexOf('</svg>')); }, 0.01);
-}
-function readRecipeForm() {
-  const r = ER.r;
-  r.name = $('#erName').value; r.note = $('#erNote').value; r.stepsTitle = $('#erStepsTitle').value;
-  r.steps = $('#erSteps').value.split('\n').map(s => s.trim()).filter(Boolean);
-  if ($('#erLook')) r.look = $('#erLook').value;
-  if ($('#erVessel')) r.vessel = $('#erVessel').value;
-  if ($('#erScoreFirst')) ER.cut.scoreFirst = $('#erScoreFirst').checked;
-}
-function saveRecipe() {
-  readRecipeForm();
-  const r = ER.r, err = m => { $('#erErr').textContent = m; $('#erErr').scrollIntoView({ block: 'center', behavior: 'smooth' }); };
-  if (!r.name.trim()) return err('メニュー名を入れてください。');
-  const rows = ER.rows.filter(x => x.k);
-  if (!rows.length) return err('材料を1つ以上選んでください。');
-  const keys = rows.map(x => x.k), dup = keys.find((k, i) => keys.indexOf(k) !== i);
-  if (dup) return err(`「${ING[dup].name}」が2回選ばれています。1つにまとめてください。`);
-  const items = {};
-  for (const x of rows) {
-    const n = ING[x.k].name, a = parseFloat(x.a), b = parseFloat(x.b);
-    if (x.mode === 'once' || isOnce(x.k)) items[x.k] = null;
-    else if (x.mode === 'range') { if (isNaN(a) || isNaN(b) || a < 0 || b <= a) return err(`「${n}」の範囲は、左に小さい数・右に大きい数を入れてください。`); items[x.k] = [a, b]; }
-    else { if (isNaN(a) || a <= 0) return err(`「${n}」の分量を入れてください。`); items[x.k] = a; }
-  }
-  if (r.cat === 'food' && ER.cutOn && !ER.cut.lines.length) return err('切り方の線を1本以上引くか、「切り方を出題する」をオフにしてください。');
-  const out = { id: ER.origId || uid('r_'), name: r.name.trim(), cat: r.cat, look: r.cat === 'food' ? 'food' : r.look, items };
-  if (r.cat === 'drink' && r.vessel) out.vessel = r.vessel;
-  if (r.note && r.note.trim()) out.note = r.note.trim();
-  if (r.steps.length) { out.stepsTitle = (r.stepsTitle || '').trim() || '手順'; out.steps = r.steps; }
-  if (r.cat === 'food' && ER.cutOn) out.cut = { scoreFirst: !!ER.cut.scoreFirst, lines: ER.cut.lines.map(l => ({ t: l.t, a: l.a.map(rnd), b: l.b.map(rnd) })) };
-  const prev = ER.origId ? R.find(x => x.id === ER.origId) : null;
-  if (prev) for (const k in prev) if (!['id', 'name', 'cat', 'look', 'items', 'vessel', 'note', 'stepsTitle', 'steps', 'cut'].includes(k)) out[k] = prev[k];
-  if (prev) R.splice(R.indexOf(prev), 1, out); else R.push(out);
-  saveData(); admRecipeTab = tabOf(out); toast(`「${out.name}」を保存しました`); openAdmin('recipes');
-}
-function deleteRecipe(btn) {
-  if (!armConfirm(btn, 'もう一度押すと削除')) return;
-  const i = R.findIndex(x => x.id === ER.origId); if (i >= 0) { const n = R[i].name; R.splice(i, 1); saveData(); toast(`「${n}」を削除しました`); }
-  openAdmin('recipes');
-}
-
-/* --- 材料の編集フォーム --- */
-let EI = null;
-const forcedOnce = g => g.cat === 'drink' && (g.kind === 'pow' || g.kind === 'top');
-function openIngEditor(k) {
-  const g = k ? clone(DATA.ingredients[k]) : { name: '', cat: admIngCat, group: '', kind: KINDS[admIngCat][0][0], vis: VISES[KINDS[admIngCat][0][0]][0][0], icon: 'jar', color: '#f2b84b', unit: '', step: 1 };
-  EI = { key: k || null, g };
-  $('#eiTitle').textContent = k ? '材料を編集' : '新しい材料';
-  renderIngForm(); show('editIng');
-}
-function renderIngForm() {
-  const g = EI.g, groups = [...new Set(Object.values(ING).filter(x => x.cat === g.cat).map(x => x.group))];
-  const used = EI.key ? usedBy(EI.key) : [], forced = forcedOnce(g);
-  if (forced) g.once = true;
-  $('#eiForm').innerHTML = `
-    <div class="preview-bin"><div id="eiPrev"></div><small class="bnote">棚にはこのように並びます。</small></div>
-    <div class="fld"><label for="eiName">材料名</label><input class="in" id="eiName" value="${esc(g.name)}" placeholder="例:キャラメルソース"></div>
-    <div class="two">
-      <div class="fld"><label for="eiCat">どちらの棚</label><select class="in" id="eiCat" ${used.length ? 'disabled' : ''}>${opts(CATS, g.cat)}</select></div>
-      <div class="fld"><label for="eiGroup">棚の分類</label><input class="in" id="eiGroup" list="eiGroups" value="${esc(g.group)}" placeholder="例:シロップ・ソース"><datalist id="eiGroups">${groups.map(x => `<option value="${esc(x)}">`).join('')}</datalist></div>
-    </div>
-    ${used.length ? '<small class="bnote">レシピで使われているため、棚(ドリンク/フード)は変えられません。</small>' : ''}
-    <div class="two">
-      <div class="fld"><label for="eiKind">入り方</label><select class="in" id="eiKind">${opts(KINDS[g.cat], g.kind)}</select></div>
-      <div class="fld"><label for="eiVis">見た目</label><select class="in" id="eiVis">${opts(VISES[g.kind] || [], g.vis)}</select></div>
-    </div>
-    <label class="check"><input type="checkbox" id="eiOnce" ${g.once ? 'checked' : ''} ${forced ? 'disabled' : ''}><span>量を指定しない(タップ1回で入る)<small>${forced ? 'トッピングと粉は、量を指定しない決まりです。' : 'ブレンドやコンソメ粉末など、量を量らないものに使います。'}</small></span></label>
-    <div class="two" id="eiAmtBox" ${g.once ? 'hidden' : ''}>
-      <div class="fld"><label for="eiUnit">単位</label><input class="in" id="eiUnit" value="${esc(g.unit)}" placeholder="g・ml・枚 など"></div>
-      <div class="fld"><label for="eiStep">1タップで増える量</label><input class="in" id="eiStep" type="number" step="any" min="0" inputmode="decimal" value="${esc(g.step)}"></div>
-    </div>
-    ${g.kind === 'layer' ? `<div class="fld"><label for="eiThick">重ねたときの厚み(見た目だけ・2〜24)</label><input class="in" id="eiThick" type="number" min="1" max="30" value="${esc(g.thickness ?? 4)}"></div>` : ''}
-    <div class="fld"><label for="eiColor">色</label><input class="in color" id="eiColor" type="color" value="${esc(g.color)}"></div>
-    <div class="fld"><span class="lbl">アイコン</span><div class="shapes" id="eiShapes">${SHAPES.map(([s, l]) => `<button type="button" data-shape="${s}" aria-pressed="${s === g.icon}" title="${l}" aria-label="${l}">${ico(s, g.color)}</button>`).join('')}</div></div>
-    <label class="check"><input type="checkbox" id="eiNeutral" ${g.neutral ? 'checked' : ''}><span>レシピにないときは判定しない<small>入れても入れなくても間違いになりません(氷など)。</small></span></label>
-    ${used.length ? `<small class="bnote">使っているメニュー:${esc(used.map(r => r.name).join('、'))}</small>` : ''}
-    <div class="err" id="eiErr"></div>
-    <div class="form-btns"><button type="button" class="btn primary" data-act="saveIng">保存</button>${EI.key ? '<button type="button" class="btn danger" data-act="deleteIng">削除</button>' : ''}</div>`;
-  renderIngPrev();
-}
-function readIngForm() {
-  const g = EI.g;
-  g.name = $('#eiName').value; g.group = $('#eiGroup').value; g.unit = $('#eiUnit').value;
-  g.step = parseFloat($('#eiStep').value); g.color = $('#eiColor').value;
-  g.once = forcedOnce(g) || $('#eiOnce').checked; g.neutral = $('#eiNeutral').checked;
-  if ($('#eiThick')) g.thickness = parseFloat($('#eiThick').value);
-}
-function renderIngPrev() { const g = EI.g; $('#eiPrev').innerHTML = `<div class="bin" style="--c:${esc(g.color)}">${ico(g.icon, g.color)}<span>${esc(g.name || '材料名')}</span></div>`; }
-function saveIng() {
-  readIngForm();
-  const g = EI.g, err = m => { $('#eiErr').textContent = m; $('#eiErr').scrollIntoView({ block: 'center', behavior: 'smooth' }); };
-  if (!g.name.trim()) return err('材料名を入れてください。');
-  if (!g.once && (isNaN(g.step) || g.step <= 0)) return err('「1タップで増える量」に0より大きい数を入れてください。');
-  const dupe = Object.entries(DATA.ingredients).find(([k, x]) => k !== EI.key && x.cat === g.cat && x.name === g.name.trim());
-  if (dupe) return err(`同じ棚に「${g.name.trim()}」がすでにあります。`);
-  const out = { name: g.name.trim(), cat: g.cat, group: g.group.trim() || 'その他', kind: g.kind, vis: g.vis, icon: g.icon, color: g.color, unit: g.unit.trim(), step: isNaN(g.step) || g.step <= 0 ? 1 : rnd(g.step) };
-  if (g.kind === 'layer') out.thickness = Math.min(30, Math.max(1, g.thickness || 4));
-  if (g.once) out.once = true;
-  if (g.neutral) out.neutral = true;
-  const key = EI.key || uid('i_');
-  DATA.ingredients[key] = out;
-  if (out.once) R.forEach(r => { if (key in r.items) r.items[key] = null; });
-  saveData(); admIngCat = out.cat; toast(`「${out.name}」を保存しました`); openAdmin('ings');
-}
-function deleteIng(btn) {
-  const used = usedBy(EI.key);
-  if (used.length) { $('#eiErr').textContent = `${used.map(r => r.name).join('、')} で使われているため削除できません。先にレシピから外してください。`; return; }
-  if (!armConfirm(btn, 'もう一度押すと削除')) return;
-  const n = DATA.ingredients[EI.key].name; delete DATA.ingredients[EI.key]; saveData(); toast(`「${n}」を削除しました`); openAdmin('ings');
 }
 
 /* =========================================================
@@ -881,90 +600,18 @@ document.addEventListener('click', e => {
   if (d.tool) { S.tool = d.tool; renderCounter(); return; }
   // ゲーム全般
   if (d.cat) { S.rushCat = d.cat; renderHome(); return; }
-  if (d.ptab) { S.pickTab = d.ptab; openPick(false); return; }
   if (d.btab) { bookTab = d.btab; renderBook(); return; }
-  if (d.pick) { const r = R.find(x => x.id === d.pick); if (!r) return; if (pickSteps) startSteps(r); else { S.mode = 'practice'; S.queue = []; startOrder(r); } return; }
-  if (d.put !== undefined) { T.picked.push(+d.put); renderSteps(); return; }
-  if (d.unpick !== undefined) { T.picked.splice(+d.unpick, 1); renderSteps(); return; }
-  // 編集
-  if (d.atab) { openAdmin(d.atab); return; }
-  if (d.artab) { admRecipeTab = d.artab; admRecipes(); return; }
-  if (d.aicat) { admIngCat = d.aicat; admIngs(); return; }
-  if (d.editRecipe) { openRecipeEditor(R.find(x => x.id === d.editRecipe)); return; }
-  if (d.editIng) { openIngEditor(d.editIng); return; }
-  if (d.rdel !== undefined) { ER.rows.splice(+d.rdel, 1); if (!ER.rows.length) ER.rows.push(emptyRow()); renderRows(); renderEditBoard(); return; }
-  if (d.vdel !== undefined) { VW.splice(+d.vdel, 1); renderVesselForm(); return; }
-  if (d.etool) { ER.tool = d.etool; document.querySelectorAll('[data-etool]').forEach(b => b.setAttribute('aria-pressed', b.dataset.etool === ER.tool)); return; }
-  if (d.shape) { EI.g.icon = d.shape; document.querySelectorAll('#eiShapes button').forEach(b => b.setAttribute('aria-pressed', b.dataset.shape === d.shape)); renderIngPrev(); return; }
   switch (a) {
     case 'home': $('#modal').hidden = true; renderHome(); break;
     case 'rush': $('#modal').hidden = true; startRush(); break;
     case 'mix': $('#modal').hidden = true; startMix(); break;
-    case 'pick': openPick(false); break;
-    case 'pickSteps': openPick(true); break;
     case 'book': renderBook(); show('book'); break;
     case 'next': nextOrder(); break;
-    case 'retry': $('#modal').hidden = true; startOrder(S.recipe); break;
-    case 'practiceMiss': S.mode = 'practice'; S.queue = S.log.filter(x => !x.ok).map(x => x.r); startOrder(S.queue.shift()); break;
-    case 'stepsCheck': T.checked = true; record(T.r.id + '_steps', T.picked.every((p, i) => T.r.steps[p] === T.r.steps[i])); renderSteps(); break;
-    case 'stepsRetry': startSteps(T.r); break;
     case 'newItem': S.build = null; S.picking = true; renderTray(); renderCounter(); renderShelf(); break;
     case 'cutUndo': if (S.build && S.build.cuts.length) { S.build.cuts.pop(); renderCounter(); renderTray(); } break;
-    case 'useBase': clearSaved(); useBase(); applyData(); toast('新しいデータに切り替えました'); renderHome(); break;
-    case 'keepLocal': { const sv = readSaved(); if (sv) { sv.baseVersion = BASE.version; writeSaved(sv); } BASE_CHANGED = false; renderHome(); break; }
-    case 'admin': openAdmin(); break;
-    case 'newRecipe': openRecipeEditor(null); break;
-    case 'addRow': ER.rows.push(emptyRow()); renderRows(); break;
-    case 'saveRecipe': saveRecipe(); break;
-    case 'copyRecipe': { readRecipeForm(); const c = clone(ER.r), rows = clone(ER.rows), cut = clone(ER.cut), on = ER.cutOn; openRecipeEditor(c, true); ER.rows = rows; ER.cut = cut; ER.cutOn = on; renderRecipeForm(); toast('複製しました。保存すると新しいメニューになります'); break; }
-    case 'deleteRecipe': deleteRecipe(t); break;
-    case 'eCutUndo': ER.cut.lines.pop(); renderEditBoard(); break;
-    case 'eCutClear': if (!ER.cut.lines.length || !armConfirm(t, 'もう一度で全部消す')) return; ER.cut.lines = []; renderEditBoard(); break;
-    case 'newIng': openIngEditor(null); break;
-    case 'saveIng': saveIng(); break;
-    case 'deleteIng': deleteIng(t); break;
-    case 'addVessel': VW.push({ name: '', shape: 'rock', orig: null }); renderVesselForm(); break;
-    case 'saveVessels': saveVessels(); break;
   }
 });
 $('#contChange').onclick = () => { S.picking = true; renderCounter(); renderShelf(); renderTray(); };
-
-// レシピフォーム
-$('#erForm').addEventListener('input', e => {
-  const t = e.target, d = t.dataset;
-  if (d.ra !== undefined) ER.rows[+d.ra].a = t.value;
-  if (d.rb !== undefined) ER.rows[+d.rb].b = t.value;
-});
-$('#erForm').addEventListener('change', e => {
-  const t = e.target, d = t.dataset;
-  if (d.rk !== undefined) { ER.rows[+d.rk].k = t.value; if (t.value && isOnce(t.value)) ER.rows[+d.rk].mode = 'once'; else if (ER.rows[+d.rk].mode === 'once') ER.rows[+d.rk].mode = 'amt'; renderRows(); renderEditBoard(); }
-  if (d.rm !== undefined) { ER.rows[+d.rm].mode = t.value; renderRows(); }
-  if (t.id === 'erCutOn') { ER.cutOn = t.checked; $('#erCutBox').hidden = !t.checked; }
-  if (t.id === 'erCat') {
-    readRecipeForm(); ER.r.cat = t.value; ER.r.look = t.value === 'food' ? 'food' : 'hot';
-    ER.rows = ER.rows.filter(x => !x.k || ING[x.k].cat === t.value); if (!ER.rows.length) ER.rows.push(emptyRow());
-    renderRecipeForm();
-  }
-});
-$('#erForm').addEventListener('submit', e => e.preventDefault());
-// 材料フォーム
-$('#eiForm').addEventListener('input', e => {
-  if (e.target.id === 'eiName' || e.target.id === 'eiColor') {
-    readIngForm(); renderIngPrev();
-    if (e.target.id === 'eiColor') document.querySelectorAll('#eiShapes button').forEach(b => b.innerHTML = ico(b.dataset.shape, EI.g.color));
-  }
-});
-$('#eiForm').addEventListener('change', e => {
-  const id = e.target.id;
-  if (id === 'eiCat') { readIngForm(); EI.g.cat = e.target.value; EI.g.kind = KINDS[EI.g.cat][0][0]; EI.g.vis = VISES[EI.g.kind][0][0]; if (!forcedOnce(EI.g)) EI.g.once = false; renderIngForm(); }
-  if (id === 'eiKind') { readIngForm(); EI.g.kind = e.target.value; EI.g.vis = VISES[EI.g.kind][0][0]; renderIngForm(); }
-  if (id === 'eiVis') EI.g.vis = e.target.value;
-  if (id === 'eiOnce') { EI.g.once = e.target.checked; $('#eiAmtBox').hidden = e.target.checked; }
-});
-$('#eiForm').addEventListener('submit', e => e.preventDefault());
-// 器フォーム
-$('#admBody').addEventListener('input', e => { const d = e.target.dataset; if (d.vname !== undefined) VW[+d.vname].name = e.target.value; });
-$('#admBody').addEventListener('change', e => { const d = e.target.dataset; if (d.vshape !== undefined) VW[+d.vshape].shape = e.target.value; });
 
 // キッチン操作
 $('#serveBtn').onclick = () => serve(false);
@@ -976,12 +623,10 @@ $('#resetBtn').onclick = () => {
   }
   const b = S.build; b.added = {}; b.seq = []; b.cuts = []; b.view = 'plate'; renderCounter(); renderShelf();
 };
-$('#hintBtn').onclick = () => { S.hint = !S.hint; renderHint(); };
 $('#quitBtn').onclick = () => {
   const b = $('#quitBtn');
-  if (S.mode !== 'practice' && !armConfirm(b, 'もう一度で終了')) return;
-  stopTimer(); closeSheet();
-  if (S.mode !== 'practice') renderHome(); else openPick(false);
+  if (!armConfirm(b, 'もう一度で終了')) return;
+  stopTimer(); closeSheet(); renderHome();
 };
 $('#bookSearch').addEventListener('input', renderBook);
 

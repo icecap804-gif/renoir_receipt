@@ -25,6 +25,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--ice);outline-of
 .app{max-width:540px;margin:0 auto;height:100%;padding-top:env(safe-area-inset-top,0px);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .screen{height:100%;display:flex;flex-direction:column}
 .scroll{overflow-y:auto;padding-block:18px 28px;gap:16px}
+.scroll>*{flex-shrink:0}
 
 /* shared */
 .btn{border-radius:16px;padding:12px 16px;font-weight:800;font-size:16px;border:2.5px solid var(--ink);box-shadow:0 4px 0 var(--ink);transition:transform .08s,box-shadow .08s;background:#fff;touch-action:manipulation}
@@ -50,28 +51,17 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--ice);outline-of
 .hero-txt{padding:14px 18px 18px}
 .hero h1{margin:0;font-size:28px;font-weight:800;letter-spacing:.02em;text-wrap:balance}
 .hero p{margin:6px 0 0;color:var(--ink-2);font-size:14px;line-height:1.6}
-.prog{display:grid;gap:10px}
-.prog-row{display:grid;grid-template-columns:5.5em 1fr 4.2em;align-items:center;gap:10px;font-size:13px;font-weight:700}
-.bar{height:12px;background:#efe6d8;border-radius:99px;overflow:hidden;border:2px solid var(--ink)}
-.bar i{display:block;height:100%;background:var(--ok);border-radius:99px}
-.prog-row b{font-variant-numeric:tabular-nums;text-align:right}
 .mode{display:grid;gap:12px}
 .mode h3{margin:0;font-size:17px;font-weight:800}
 .mode p{margin:0;color:var(--ink-2);font-size:13px;line-height:1.6}
-.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .tile-btn{text-align:left;background:var(--paper);border:2.5px solid var(--ink);border-radius:18px;padding:14px;box-shadow:0 4px 0 var(--ink);display:grid;gap:4px}
 .tile-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
 .tile-btn b{font-size:16px;font-weight:800}
 .tile-btn span{font-size:12px;color:var(--ink-2);line-height:1.5}
-.tile-btn.wide{grid-column:1/-1}
 .foot{font-size:12px;color:var(--ink-2);text-align:center;line-height:1.6}
 
 /* lists */
 .list{flex:1;overflow-y:auto;display:grid;gap:8px;align-content:start;padding-block:12px 24px}
-.row{display:flex;align-items:center;gap:10px;background:var(--paper);border:2px solid var(--ink);border-radius:14px;padding:12px 14px;text-align:left;width:100%}
-.row:active{background:#fff1e3}
-.row .nm{flex:1;font-weight:800;font-size:15px;min-width:0}
-.row small{display:block;color:var(--ink-2);font-weight:500;font-size:12px;margin-top:2px}
 
 /* kitchen */
 .kbar{display:flex;align-items:center;gap:10px;padding-block:10px 8px}
@@ -84,8 +74,6 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--ice);outline-of
 .timer{height:8px;border-radius:99px;background:#efe6d8;margin-top:8px;overflow:hidden}
 .timer i{display:block;height:100%;width:100%;background:var(--ok);transform-origin:left}
 .timer.warn i{background:var(--ng)}
-.hint-btn{position:absolute;right:10px;top:10px;font-size:12px;font-weight:800;border:2px solid var(--ink);border-radius:10px;padding:5px 9px;background:#fff7c9}
-.hintbox{margin-top:8px;background:#fff7c9;border:2px dashed var(--ink);border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.7}
 .counter{position:relative;margin-top:10px;background:linear-gradient(var(--wood) 0 70%,var(--wood-d) 70%);border:2.5px solid var(--ink);border-radius:18px;padding:8px 10px 10px;display:grid;gap:6px}
 .counter::after{content:"";position:absolute;inset:auto 0 30% 0;height:2px;background:rgba(58,44,37,.25)}
 .vessel{height:clamp(150px,26vh,210px);display:flex;justify-content:center;position:relative;z-index:1}
@@ -157,19 +145,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--ice);outline-of
 .modal-btns .btn{flex:1 1 30%}
 .pts{font-family:var(--f-dig);font-size:18px}
 
-/* steps */
-.st-wrap{flex:1;overflow-y:auto;display:grid;gap:12px;align-content:start;padding-block:6px 20px}
 .st-title{font-size:20px;font-weight:800;margin:0}
 .st-sub{font-size:13px;color:var(--ink-2);margin:2px 0 0}
-.slots{display:grid;gap:8px;counter-reset:s}
-.slot{display:flex;gap:10px;align-items:flex-start;background:#fff;border:2px dashed #b9aa9c;border-radius:14px;padding:10px 12px;min-height:46px;font-size:14px;line-height:1.55;text-align:left;width:100%}
-.slot::before{counter-increment:s;content:counter(s);flex:none;width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;font-size:13px;font-weight:800;display:grid;place-items:center}
-.slot.filled{border-style:solid;border-color:var(--ink);background:var(--paper)}
-.slot.good{border-color:var(--ok);background:#e9f6ee}.slot.bad{border-color:var(--ng);background:#fdecea}
-.slot .fix{display:block;font-size:12px;color:var(--ok);font-weight:800;margin-top:4px}
-.pool{display:grid;gap:8px}
-.pcard{background:var(--paper);border:2.5px solid var(--ink);border-radius:14px;padding:10px 12px;font-size:14px;line-height:1.55;text-align:left;box-shadow:0 3px 0 var(--ink);width:100%}
-.pcard:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
 
 /* book */
 .search{width:100%;font:inherit;font-size:15px;border:2.5px solid var(--ink);border-radius:14px;padding:10px 12px;background:#fff;color:var(--ink)}
@@ -192,52 +169,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--ice);outline-of
 @media (max-width:360px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.t-name{font-size:19px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-/* ===== 編集画面 ===== */
-.adm-body{flex:1;overflow-y:auto;display:grid;gap:10px;align-content:start;padding-block:12px 28px}
-.adm-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.adm-tools .btn{padding:9px 14px;font-size:14px}
-.row .ico{flex:none;width:34px;height:34px}
-.row .ico svg{width:34px;height:34px}
-.group-h{font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--ink-2);margin:8px 2px 0}
-.banner{background:#fff7c9;border:2.5px solid var(--ink);border-radius:16px;padding:12px 14px;font-size:13px;line-height:1.7;display:grid;gap:8px}
-.banner .modal-btns .btn{padding:9px 12px;font-size:14px}
-.form{flex:1;overflow-y:auto;display:grid;gap:14px;align-content:start;padding-block:12px 28px}
-.fld{display:grid;gap:5px}
-.fld>label,.fld>.lbl{font-size:12px;font-weight:800;letter-spacing:.04em;color:var(--ink-2)}
-.fld small{font-size:12px;color:var(--ink-2);line-height:1.5}
-.in{width:100%;min-width:0;font:inherit;font-size:15px;color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:12px;padding:9px 11px}
-textarea.in{min-height:84px;resize:vertical;line-height:1.6}
-.in.color{padding:3px;height:44px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.two>*{min-width:0}
-.check{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;background:#fff;border:2px solid var(--ink);border-radius:12px;padding:10px 12px}
-.check input{width:20px;height:20px;flex:none;margin:1px 0 0;accent-color:var(--accent)}
-.check small{display:block}
-.irows{display:grid;gap:8px}
-.irow{display:grid;grid-template-columns:minmax(0,1fr) 7.4em 36px;gap:6px;align-items:center;background:#fff;border:2px solid var(--ink);border-radius:14px;padding:8px}
-.irow .amts{grid-column:1/-1;display:flex;gap:6px;align-items:center;font-size:13px;font-weight:700}
-.irow .amts .in{width:6.5em;flex:none;padding:7px 9px}
-.irow .amts span{color:var(--ink-2)}
-.irow .del{width:36px;height:36px;border:2px solid var(--ink);border-radius:10px;font-size:18px;background:var(--paper)}
-.irow select.in{padding:8px 6px;font-size:14px}
-.err{color:var(--ng);font-weight:800;font-size:13px;line-height:1.6}
-.err:empty{display:none}
-.shapes{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
-.shapes button{border:2px solid var(--ink);border-radius:12px;background:#fff;padding:4px;display:grid;place-items:center}
-.shapes button svg{width:36px;height:36px}
-.shapes button[aria-pressed="true"]{outline:3px solid var(--accent);outline-offset:1px;background:#fff1e3}
-.preview-bin{display:flex;gap:12px;align-items:center}
-.preview-bin .bin{width:86px;flex:none}
-.form-btns{display:flex;gap:10px;flex-wrap:wrap}
-.form-btns .btn{flex:1 1 30%}
-.btn.danger{background:#fdecea;color:var(--ng)}
-.vrow{display:grid;grid-template-columns:minmax(0,1fr) 9em 36px;gap:6px;align-items:center}
-.vrow .del{width:36px;height:36px;border:2px solid var(--ink);border-radius:10px;font-size:18px;background:var(--paper)}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:40;background:var(--ink);color:#fff;font-weight:700;font-size:14px;padding:10px 16px;border-radius:12px;max-width:calc(100% - 32px);animation:up .2s ease}
-.status{display:flex;gap:8px;align-items:center;font-size:13px;font-weight:700}
-.dot{width:10px;height:10px;border-radius:50%;background:var(--ok);flex:none}
-.dot.edited{background:var(--food)}
-.ta-code{font-family:ui-monospace,Menlo,monospace;font-size:12px;min-height:120px}
 
 /* ===== 材料棚:分類タブ ===== */
 .shelf{display:flex;flex-direction:column;gap:8px}
@@ -272,13 +204,11 @@ textarea.in{min-height:84px;resize:vertical;line-height:1.6}
 .cutpair figure{margin:0;display:grid;gap:4px;justify-items:center;font-size:12px;font-weight:800;color:var(--ink-2)}
 .cutpair svg{width:100%;max-width:150px;height:auto;background:#fff;border:2px solid var(--line);border-radius:12px}
 .cutmsg{font-size:13px;line-height:1.6;color:var(--ng);font-weight:700;margin:0}
-.board-edit{display:flex;justify-content:center;background:#fff;border:2px solid var(--ink);border-radius:14px;padding:6px}
-.board-edit svg{width:min(100%,280px);height:auto;touch-action:none;cursor:crosshair}
 .hint-cut{display:flex;gap:10px;align-items:center;margin-top:6px}
 .hint-cut svg{width:110px;height:110px;flex:none;background:#fff;border-radius:10px}
 .bcut{width:140px;height:140px;background:#fff;border-radius:12px;border:1.5px solid var(--line)}
 
-/* ===== 伝票ラッシュ ===== */
+/* ===== 実践編 ===== */
 .t-list{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:4px;padding-right:0}
 .t-list li{display:flex;gap:8px;align-items:center;font-size:16px;font-weight:800;border-bottom:1.5px dashed var(--line);padding-bottom:4px}
 .t-list li .badge{font-size:10px;flex:none}
@@ -294,3 +224,51 @@ textarea.in{min-height:84px;resize:vertical;line-height:1.6}
 .mixitem h4 .m{font-size:18px}
 .mixitem.good h4 .m{color:var(--ok)}.mixitem.bad h4 .m{color:var(--ng)}
 .mixitem p{margin:0;font-size:13px;color:var(--ink-2)}
+
+/* ===== キッチン画面:潰れ防止 =====
+   中身が画面に収まらないときは画面ごとスクロールし、各パーツは縮めない */
+#kitchen{overflow-y:auto;overscroll-behavior:contain}
+#kitchen>*{flex-shrink:0}
+#kitchen .shelf{flex:1 0 auto;min-height:196px;overflow:visible}
+#kitchen .actions{position:sticky;bottom:0;z-index:5;background:var(--tile);margin-top:auto}
+
+/* 実践編は詰めて表示 */
+#kitchen.mix .ticket{padding-block:8px 10px}
+#kitchen.mix .t-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+#kitchen.mix .t-list li{font-size:14px;border:2px solid var(--ink);border-radius:10px;padding:3px 9px;background:#fff;border-bottom-width:2px}
+#kitchen.mix .timer{margin-top:8px}
+#kitchen.mix .tray{margin-top:8px;padding-block:3px 5px}
+#kitchen.mix .tray button{width:62px;min-height:66px;padding:3px;font-size:10px}
+#kitchen.mix .tray button svg{width:40px;height:40px}
+#kitchen.mix .tray .add{min-height:66px;align-content:center}
+#kitchen.mix .counter{margin-top:8px;padding-block:6px 8px}
+#kitchen.mix .vessel{height:clamp(120px,21vh,180px)}
+#kitchen.mix .contpick{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+#kitchen.mix .contpick button{padding:5px 2px;font-size:11px}
+#kitchen.mix .contpick svg{width:34px;height:34px}
+#kitchen.mix .shelf{margin-top:8px}
+@media (max-width:360px){#kitchen.mix .contpick{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-height:720px){
+  .vessel{height:clamp(120px,22vh,160px)}
+  #kitchen.mix .vessel{height:112px}
+  #kitchen.mix .t-list li{font-size:13px;padding:2px 8px}
+  .gtabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-2px;padding-inline:2px}
+  .gtabs::-webkit-scrollbar{display:none}
+  .gtabs button{padding:5px 9px;font-size:12px;flex:none}
+  #kitchen.mix .vessel{height:100px}
+  #kitchen .shelf{min-height:170px}
+}
+#kitchen.mix .tray button span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#kitchen.mix .tray button,#kitchen.mix .tray .add{min-height:60px}
+/* 実践編:テーブル番号と品名を1つの流れに並べる */
+#kitchen.mix .ticket{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+#kitchen.mix .t-top{flex:none}
+#kitchen.mix .t-list{display:contents}
+#kitchen.mix .timer{flex:1 0 100%;margin-top:4px}
+@media (max-height:720px){
+  #kitchen .actions .btn{padding-block:9px;font-size:15px}
+  #kitchen .actions{padding-block:8px calc(8px + env(safe-area-inset-bottom,0px))}
+  #kitchen .chips{min-height:28px}
+  #kitchen.mix .tray button svg{width:34px;height:34px}
+}
+@media (max-height:700px){#kitchen.mix .vessel{height:84px}}

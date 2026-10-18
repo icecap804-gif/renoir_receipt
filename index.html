@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>喫茶レシピキッチン</title>
+<title>ルノアール暗記用</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,7 +16,6 @@
 
 <!-- ホーム -->
 <section id="home" class="screen scroll">
-  <div id="baseBanner"></div>
   <div class="hero">
     <svg class="hero-art" viewBox="0 0 360 150" aria-hidden="true">
       <defs><pattern id="tl" width="30" height="30" patternUnits="userSpaceOnUse"><rect width="30" height="30" fill="#cfe6ea"/><path d="M30 0V30M0 30H30" stroke="#b3d3d9" stroke-width="2"/></pattern></defs>
@@ -37,48 +36,32 @@
       </g>
     </svg>
     <div class="hero-txt">
-      <h1>喫茶レシピキッチン</h1>
-      <p id="heroCount">注文票どおりに材料を入れて、分量を手で覚えるゲームです。</p>
+      <p id="heroCount">2026年10月〜</p>
     </div>
   </div>
 
-  <div class="card prog" id="progCard"></div>
-
   <div class="card mode">
     <div>
-      <h3>営業モード</h3>
-      <p>注文が10品続けて入ります。制限時間内に作って提供してください。間違えやすいメニューほどよく出ます。</p>
+      <h3>練習</h3>
+      <p>注文が10品続けて入ります。制限時間内に作って提供してください。</p>
     </div>
     <div class="tabs" id="rushCat">
       <button data-cat="all" aria-pressed="true">すべて</button>
       <button data-cat="drink" aria-pressed="false">ドリンク</button>
       <button data-cat="food" aria-pressed="false">フード</button>
     </div>
-    <button class="btn primary" data-act="rush">営業スタート</button>
+    <button class="btn primary" data-act="rush">練習スタート</button>
   </div>
 
   <div class="card mode">
     <div>
-      <h3>伝票ラッシュ</h3>
-      <p>テーブルの伝票に並んだ品を、器選びから自分で判断してまとめて作ります。どの器に何を入れたかで判定します。伝票5枚で1回です。</p>
+      <h3>実践編</h3>
+      <p>テーブルの伝票に並んだ品を、器選びから自分で判断してまとめて作ります。</p>
     </div>
-    <button class="btn primary" data-act="mix">伝票ラッシュ開始</button>
+    <button class="btn primary" data-act="mix">実践編スタート</button>
   </div>
 
-  <div class="mode-grid">
-    <button class="tile-btn" data-act="pick"><b>練習</b><span>メニューを選んで、ヒントを見ながら作ります</span></button>
-    <button class="tile-btn" data-act="pickSteps"><b>手順ならべ</b><span>組み立てや仕上げの順番を並べ替えます</span></button>
-    <button class="tile-btn" data-act="book"><b>レシピ帳</b><span>全メニューの材料と分量を一覧で確認できます</span></button>
-    <button class="tile-btn" data-act="admin"><b>レシピ編集</b><span>メニュー・材料・器の追加や修正ができます</span></button>
-  </div>
-  <p class="foot">記録と編集内容はこの端末のブラウザに保存されます。<br>同じメニューを3回連続で正解すると「覚えた」になります。</p>
-</section>
-
-<!-- メニュー選択 -->
-<section id="pick" class="screen" hidden>
-  <div class="topbar"><button class="back" data-act="home">‹ ホーム</button><h2 id="pickTitle">練習するメニュー</h2></div>
-  <div class="tabs" id="pickTabs"></div>
-  <div class="list" id="pickList"></div>
+  <button class="tile-btn wide" data-act="book"><b>レシピ帳</b><span>全メニューの材料・分量・切り方を一覧で確認できます</span></button>
 </section>
 
 <!-- キッチン -->
@@ -94,9 +77,7 @@
     <div class="t-name" id="tName"></div>
     <ul class="t-list" id="tList" hidden></ul>
     <div class="timer" id="timer"><i id="timerBar"></i></div>
-    <button class="hint-btn" id="hintBtn">ヒント</button>
   </div>
-  <div class="hintbox" id="hintBox" hidden></div>
   <div class="tray" id="tray" hidden></div>
   <div class="counter" id="counter">
     <div class="ctop">
@@ -107,8 +88,8 @@
     <div class="contpick" id="contPick" hidden></div>
     <div class="vessel" id="vessel"></div>
     <div class="cuttools" id="cutTools" hidden>
-      <button data-tool="score" aria-pressed="true"><svg viewBox="0 0 40 10" aria-hidden="true"><path d="M2 5H38" stroke="currentColor" stroke-width="4" stroke-dasharray="2 6" stroke-linecap="round"/></svg>切込み</button>
-      <button data-tool="cut" aria-pressed="false"><svg viewBox="0 0 40 10" aria-hidden="true"><path d="M2 5H38" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>カット</button>
+      <button data-tool="cut" aria-pressed="true"><svg viewBox="0 0 40 10" aria-hidden="true"><path d="M2 5H38" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>カット</button>
+      <button data-tool="score" aria-pressed="false"><svg viewBox="0 0 40 10" aria-hidden="true"><path d="M2 5H38" stroke="currentColor" stroke-width="4" stroke-dasharray="2 6" stroke-linecap="round"/></svg>切込み</button>
       <button data-act="cutUndo">1本戻す</button>
     </div>
     <div class="chips" id="chips"></div>
@@ -120,12 +101,6 @@
   </div>
 </section>
 
-<!-- 手順ならべ -->
-<section id="steps" class="screen" hidden>
-  <div class="topbar"><button class="back" data-act="pickSteps">‹ 一覧</button><h2>手順ならべ</h2></div>
-  <div class="st-wrap" id="stWrap"></div>
-</section>
-
 <!-- レシピ帳 -->
 <section id="book" class="screen" hidden>
   <div class="topbar"><button class="back" data-act="home">‹ ホーム</button><h2>レシピ帳</h2></div>
@@ -134,31 +109,9 @@
   <div class="list" id="bookList"></div>
 </section>
 
-<!-- 営業結果 -->
+<!-- 結果 -->
 <section id="summary" class="screen scroll" hidden></section>
 
-<!-- レシピ編集トップ -->
-<section id="admin" class="screen" hidden>
-  <div class="topbar"><button class="back" data-act="home">‹ ホーム</button><h2>レシピ編集</h2></div>
-  <div class="tabs" id="admTabs">
-    <button data-atab="recipes" aria-pressed="true">レシピ</button>
-    <button data-atab="ings" aria-pressed="false">材料</button>
-    <button data-atab="vessels" aria-pressed="false">器</button>
-  </div>
-  <div class="adm-body" id="admBody"></div>
-</section>
-
-<!-- レシピの編集フォーム -->
-<section id="editRecipe" class="screen" hidden>
-  <div class="topbar"><button class="back" data-act="admin">‹ 戻る</button><h2 id="erTitle">レシピを編集</h2></div>
-  <form class="form" id="erForm" novalidate></form>
-</section>
-
-<!-- 材料の編集フォーム -->
-<section id="editIng" class="screen" hidden>
-  <div class="topbar"><button class="back" data-act="admin">‹ 戻る</button><h2 id="eiTitle">材料を編集</h2></div>
-  <form class="form" id="eiForm" novalidate></form>
-</section>
 </div>
 
 <!-- 計量シート -->

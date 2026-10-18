@@ -1,11 +1,11 @@
 /*
-  喫茶レシピキッチン ゲームデータ
+  ルノアール暗記用 ゲームデータ
   ・このファイルを書き換えて Netlify にアップロードし直すと、全員のゲームに反映されます。
   ・JSON の形を崩さないようにしてください(各項目の説明は README.md にあります)。
-  ・内容を変えたら version も別の文字に変えてください。アプリ内で編集していたブラウザに「新しいレシピデータがあります」と表示されます。
+  ・内容を変えたら version も別の文字(更新した日付など)に変えてください。
 */
 window.GAME_DATA = {
-  "version": "2026-10-18-2",
+  "version": "2026-10-19-3",
   "vessels": [
     {
       "name": "グラス",
@@ -420,7 +420,8 @@ window.GAME_DATA = {
       "color": "#f8e08e",
       "unit": "g",
       "step": 1,
-      "thickness": 3
+      "thickness": 3,
+      "once": true
     },
     "mayo": {
       "name": "マヨネーズ",
@@ -432,7 +433,8 @@ window.GAME_DATA = {
       "color": "#fbf0c4",
       "unit": "g",
       "step": 1,
-      "thickness": 3
+      "thickness": 3,
+      "once": true
     },
     "mustard": {
       "name": "マスタード",
@@ -444,7 +446,8 @@ window.GAME_DATA = {
       "color": "#e2b021",
       "unit": "g",
       "step": 1,
-      "thickness": 3
+      "thickness": 3,
+      "once": true
     },
     "honeyMustard": {
       "name": "ハニーマスタード",
@@ -456,7 +459,8 @@ window.GAME_DATA = {
       "color": "#e9a62a",
       "unit": "g",
       "step": 1,
-      "thickness": 3
+      "thickness": 3,
+      "once": true
     },
     "pizzaSauce": {
       "name": "ピザソース",
@@ -468,7 +472,8 @@ window.GAME_DATA = {
       "color": "#d9472b",
       "unit": "g",
       "step": 1,
-      "thickness": 4
+      "thickness": 4,
+      "once": true
     },
     "caesar": {
       "name": "シーザードレッシング",
@@ -480,7 +485,8 @@ window.GAME_DATA = {
       "color": "#f2ebd6",
       "unit": "g",
       "step": 1,
-      "thickness": 3
+      "thickness": 3,
+      "once": true
     },
     "honey": {
       "name": "ハチミツ",
@@ -492,7 +498,8 @@ window.GAME_DATA = {
       "color": "#f0a91e",
       "unit": "g",
       "step": 1,
-      "thickness": 3
+      "thickness": 3,
+      "once": true
     },
     "ham": {
       "name": "ロースハム",
@@ -552,7 +559,8 @@ window.GAME_DATA = {
       "color": "#f9e08a",
       "unit": "g",
       "step": 5,
-      "thickness": 8
+      "thickness": 8,
+      "once": true
     },
     "cheesePowder": {
       "name": "粉チーズ",
@@ -577,7 +585,8 @@ window.GAME_DATA = {
       "color": "#f7d45c",
       "unit": "g",
       "step": 1,
-      "thickness": 10
+      "thickness": 10,
+      "once": true
     },
     "saba": {
       "name": "サバ",
@@ -613,7 +622,8 @@ window.GAME_DATA = {
       "color": "#b8692e",
       "unit": "g",
       "step": 5,
-      "thickness": 12
+      "thickness": 12,
+      "once": true
     },
     "cucumber": {
       "name": "キュウリ",
@@ -637,7 +647,8 @@ window.GAME_DATA = {
       "color": "#78c25a",
       "unit": "g",
       "step": 1,
-      "thickness": 6
+      "thickness": 6,
+      "once": true
     },
     "onion": {
       "name": "オニオンスライス",
@@ -649,7 +660,8 @@ window.GAME_DATA = {
       "color": "#efe3f2",
       "unit": "g",
       "step": 1,
-      "thickness": 4
+      "thickness": 4,
+      "once": true
     },
     "tomato": {
       "name": "トマトスライス",
@@ -742,7 +754,8 @@ window.GAME_DATA = {
       "icon": "ball",
       "color": "#fff3d4",
       "unit": "g",
-      "step": 5
+      "step": 5,
+      "once": true
     }
   },
   "recipes": [
@@ -1185,7 +1198,7 @@ window.GAME_DATA = {
       "look": "food",
       "items": {
         "breadT": 0.5,
-        "butter": 8,
+        "butter": null,
         "consomme": null,
         "egg": 1
       },
@@ -1246,9 +1259,9 @@ window.GAME_DATA = {
       "look": "food",
       "items": {
         "breadS": 2,
-        "mustard": 8,
-        "mayo": 8,
-        "eggpaste": 45,
+        "mustard": null,
+        "mayo": null,
+        "eggpaste": null,
         "ham": 2,
         "consomme": null
       },
@@ -1310,14 +1323,14 @@ window.GAME_DATA = {
       "look": "food",
       "items": {
         "breadS": 2,
-        "mayo": 8,
-        "mustard": 8,
+        "mayo": null,
+        "mustard": null,
         "ham": 2,
         "cucumber": 3,
         "consomme": null,
         "egg": 1
       },
-      "note": "スープ(コンソメ粉末4g)とゆで卵を添えます。",
+      "note": "スープ(コンソメ粉末)とゆで卵を添えます。",
       "stepsTitle": "サンドの組み立て順(下から)",
       "steps": [
         "サンドパン(下)",
@@ -1395,26 +1408,26 @@ window.GAME_DATA = {
       "look": "food",
       "items": {
         "breadT": 0.5,
-        "butter": 8,
+        "butter": null,
         "whiteRose": 1,
-        "eggpaste": 45,
-        "leaf": 15,
-        "onion": 3,
+        "eggpaste": null,
+        "leaf": null,
+        "onion": null,
         "tomato": 0.5,
-        "caesar": 10,
+        "caesar": null,
         "cheesePowder": null,
         "consomme": null
       },
-      "note": "グリーンリーフは葉の部分だけを、フリルが見えるよう縦に入れるときれいに見えます。オニオンスライスは散らすように盛ります。シーザードレッシング10g・パルメザンチーズ2g。",
+      "note": "グリーンリーフは葉の部分だけを、フリルが見えるよう縦に入れるときれいに見えます。オニオンスライスは散らすように盛ります。",
       "stepsTitle": "下準備と作り方の順番",
       "steps": [
-        "(下準備)サラダ用のアンプボール(透明な器)に、グリーンリーフ15g・オニオンスライス3g・トマトスライス0.5枚を盛り付ける",
+        "(下準備)サラダ用のアンプボール(透明な器)に、グリーンリーフ・オニオンスライス・トマトスライス0.5枚を盛り付ける",
         "角パン(トースト用)0.5枚を半分にカットし、トースターでキツネ色になるまで焼く",
-        "焼き上がったトーストに発酵バターブレンド8gを塗る",
-        "スープカップにコンソメ粉末4gを入れ、熱湯を注ぐ",
+        "焼き上がったトーストに発酵バターブレンドを塗る",
+        "スープカップにコンソメ粉末を入れ、熱湯を注ぐ",
         "サラダにパルメザンチーズを振り、シーザードレッシングをかける",
         "モーニング用皿に、サラダ・スープ・トースト・ホワイトロースを置く",
-        "ホワイトロースの横に、タマゴペースト45g(#18ディッシャーすりきり1杯)を乗せる"
+        "ホワイトロースの横に、タマゴペースト(#18ディッシャーすりきり1杯)を乗せる"
       ]
     },
     {
@@ -1424,7 +1437,7 @@ window.GAME_DATA = {
       "look": "food",
       "items": {
         "breadT": 1,
-        "butter": 8
+        "butter": null
       },
       "cut": {
         "scoreFirst": true,
@@ -1516,10 +1529,82 @@ window.GAME_DATA = {
       "look": "food",
       "items": {
         "breadT": 1,
-        "butter": 8,
-        "honey": 15,
-        "vanillaF": 45
-      }
+        "butter": null,
+        "honey": null,
+        "vanillaF": null
+      },
+      "cut": {
+        "scoreFirst": true,
+        "lines": [
+          {
+            "t": "score",
+            "a": [
+              0,
+              0.12
+            ],
+            "b": [
+              1,
+              0.3
+            ]
+          },
+          {
+            "t": "score",
+            "a": [
+              0,
+              0.42
+            ],
+            "b": [
+              1,
+              0.6
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0,
+              0.06
+            ],
+            "b": [
+              1,
+              0.06
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0,
+              0.36
+            ],
+            "b": [
+              1,
+              0.36
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0,
+              0.66
+            ],
+            "b": [
+              1,
+              0.66
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0,
+              0.94
+            ],
+            "b": [
+              1,
+              0.94
+            ]
+          }
+        ]
+      },
+      "note": "切込み2本を入れてからカット4本。トーストと違い、3つのうち1つには切込みを入れません。"
     },
     {
       "id": "mixsand",
@@ -1528,15 +1613,87 @@ window.GAME_DATA = {
       "look": "food",
       "items": {
         "breadS": 2,
-        "mayo": 12,
-        "mustard": 8,
-        "eggpaste": 45,
+        "mayo": null,
+        "mustard": null,
+        "eggpaste": null,
         "cucumber": 3,
         "bacon": 1,
         "sliceCheese": 1,
         "tomato": 1,
-        "leaf": 8
-      }
+        "leaf": null
+      },
+      "cut": {
+        "scoreFirst": false,
+        "lines": [
+          {
+            "t": "cut",
+            "a": [
+              0.06,
+              0
+            ],
+            "b": [
+              0.06,
+              1
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0.94,
+              0
+            ],
+            "b": [
+              0.94,
+              1
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0,
+              0.06
+            ],
+            "b": [
+              1,
+              0.06
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0,
+              0.94
+            ],
+            "b": [
+              1,
+              0.94
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0,
+              0
+            ],
+            "b": [
+              1,
+              1
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              1,
+              0
+            ],
+            "b": [
+              0,
+              1
+            ]
+          }
+        ]
+      },
+      "note": "耳を4辺とも切り落としてから、対角線を結んで4等分します。"
     },
     {
       "id": "saba",
@@ -1545,15 +1702,32 @@ window.GAME_DATA = {
       "look": "food",
       "items": {
         "breadT": 1,
-        "pizzaSauce": 20,
+        "pizzaSauce": null,
         "saba": 3,
-        "onion": 20,
-        "mayo": 12,
+        "onion": null,
+        "mayo": null,
         "cucumber": 3,
         "tomato": 1,
-        "leaf": 15,
-        "mustard": 8
-      }
+        "leaf": null,
+        "mustard": null
+      },
+      "cut": {
+        "scoreFirst": false,
+        "lines": [
+          {
+            "t": "cut",
+            "a": [
+              0.5,
+              0
+            ],
+            "b": [
+              0.5,
+              1
+            ]
+          }
+        ]
+      },
+      "note": "真ん中で二等分します。"
     },
     {
       "id": "stew",
@@ -1565,11 +1739,11 @@ window.GAME_DATA = {
         "parsley": null,
         "portion": 1,
         "breadT": 0.5,
-        "butter": 8,
-        "leaf": 15,
-        "onion": 3,
+        "butter": null,
+        "leaf": null,
+        "onion": null,
         "tomato": 0.5,
-        "caesar": 10,
+        "caesar": null,
         "cheesePowder": null
       }
     },
@@ -1580,10 +1754,27 @@ window.GAME_DATA = {
       "look": "food",
       "items": {
         "breadT": 1,
-        "pizzaSauce": 40,
+        "pizzaSauce": null,
         "hamburg": 1,
         "sliceCheese": 2
-      }
+      },
+      "cut": {
+        "scoreFirst": false,
+        "lines": [
+          {
+            "t": "cut",
+            "a": [
+              0.5,
+              0
+            ],
+            "b": [
+              0.5,
+              1
+            ]
+          }
+        ]
+      },
+      "note": "真ん中で二等分します。"
     },
     {
       "id": "teriyaki",
@@ -1592,10 +1783,37 @@ window.GAME_DATA = {
       "look": "food",
       "items": {
         "breadS": 2,
-        "mayo": 8,
-        "honeyMustard": 8,
-        "teriyaki": 150,
-        "leaf": 8
+        "mayo": null,
+        "honeyMustard": null,
+        "teriyaki": null,
+        "leaf": null
+      },
+      "cut": {
+        "scoreFirst": false,
+        "lines": [
+          {
+            "t": "cut",
+            "a": [
+              0.5,
+              0
+            ],
+            "b": [
+              0.5,
+              1
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0,
+              0.5
+            ],
+            "b": [
+              1,
+              0.5
+            ]
+          }
+        ]
       }
     },
     {
@@ -1605,12 +1823,62 @@ window.GAME_DATA = {
       "look": "food",
       "items": {
         "breadT": 1,
-        "pizzaSauce": 40,
-        "mayo": 10,
-        "shred": 70,
+        "pizzaSauce": null,
+        "mayo": null,
+        "shred": null,
         "piman": 3,
         "bacon": 0.5
-      }
+      },
+      "cut": {
+        "scoreFirst": false,
+        "lines": [
+          {
+            "t": "cut",
+            "a": [
+              0.06,
+              0
+            ],
+            "b": [
+              0.06,
+              1
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0.94,
+              0
+            ],
+            "b": [
+              0.94,
+              1
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0.35,
+              0
+            ],
+            "b": [
+              0.35,
+              1
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0.65,
+              0
+            ],
+            "b": [
+              0.65,
+              1
+            ]
+          }
+        ]
+      },
+      "note": "左右の耳だけを切り落とし、3等分します。"
     },
     {
       "id": "baconcheese",
@@ -1619,18 +1887,18 @@ window.GAME_DATA = {
       "look": "food",
       "items": {
         "breadT": 1,
-        "mayo": 8,
-        "mustard": 8,
+        "mayo": null,
+        "mustard": null,
         "bacon": 1.5,
         "cucumber": 3,
         "sliceCheese": 1
       },
-      "note": "サンドした状態で焼くとベーコンが温まらないため、必ず別々に焼きます。コレール皿の汚れも確認します。手順3のつなぎ用マヨネーズ3gは、表の8gとは別です。",
+      "note": "サンドした状態で焼くとベーコンが温まらないため、必ず別々に焼きます。コレール皿の汚れも確認します。",
       "stepsTitle": "作り方の順番",
       "steps": [
-        "トーストパンを半分にスライスし、片面にマヨネーズ8g、もう片面にマスタード8gを塗る",
+        "トーストパンを半分にスライスし、片面にマヨネーズ、もう片面にマスタードを塗る",
         "片面にベーコン3枚、もう片面にキュウリ3枚とスライスチーズを乗せ、トースターで焼く",
-        "焼き上がったら、マヨネーズ3gをつなぎにしてサンドする",
+        "焼き上がったら、マヨネーズをつなぎにしてサンドする",
         "パンの耳の左右を切り落とし、断面からキュウリが3枚見える向きで3つにカットする",
         "コレール皿に紙ナプキンを敷き、①を耳側を下にして皿の中央に置き、②も盛り付ける"
       ],
