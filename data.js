@@ -1,11 +1,11 @@
 /*
   喫茶レシピキッチン ゲームデータ
-  ・アプリの「レシピ編集」→「データ」→「data.js を書き出す」で作ったファイルで、このファイルを丸ごと置き換えられます。
-  ・手で直す場合は、下の JSON の形を崩さないようにしてください(各項目の説明は README.md にあります)。
-  ・内容を変えたら version も変えてください。各ブラウザに「新しいデータがあります」と表示されます。
+  ・このファイルを書き換えて Netlify にアップロードし直すと、全員のゲームに反映されます。
+  ・JSON の形を崩さないようにしてください(各項目の説明は README.md にあります)。
+  ・内容を変えたら version も別の文字に変えてください。アプリ内で編集していたブラウザに「新しいレシピデータがあります」と表示されます。
 */
 window.GAME_DATA = {
-  "version": "2026-10-18-1",
+  "version": "2026-10-18-2",
   "vessels": [
     {
       "name": "グラス",
@@ -163,7 +163,8 @@ window.GAME_DATA = {
       "icon": "jar",
       "color": "#6b4520",
       "unit": "g",
-      "step": 1
+      "step": 1,
+      "once": true
     },
     "cocoa": {
       "name": "ココア",
@@ -174,7 +175,8 @@ window.GAME_DATA = {
       "icon": "jar",
       "color": "#7a4a2c",
       "unit": "",
-      "step": 1
+      "step": 1,
+      "once": true
     },
     "sugar": {
       "name": "砂糖",
@@ -185,7 +187,8 @@ window.GAME_DATA = {
       "icon": "jar",
       "color": "#fffdf6",
       "unit": "",
-      "step": 1
+      "step": 1,
+      "once": true
     },
     "matcha": {
       "name": "抹茶粉",
@@ -196,7 +199,8 @@ window.GAME_DATA = {
       "icon": "jar",
       "color": "#6f9d3a",
       "unit": "g",
-      "step": 1
+      "step": 1,
+      "once": true
     },
     "matchaS": {
       "name": "抹茶粉(ふりかけ)",
@@ -207,7 +211,8 @@ window.GAME_DATA = {
       "icon": "shaker",
       "color": "#6f9d3a",
       "unit": "g",
-      "step": 0.1
+      "step": 0.1,
+      "once": true
     },
     "kuromitsu": {
       "name": "黒蜜",
@@ -317,7 +322,8 @@ window.GAME_DATA = {
       "icon": "tub",
       "color": "#ffffff",
       "unit": "",
-      "step": 5
+      "step": 5,
+      "once": true
     },
     "vanilla": {
       "name": "バニラ",
@@ -340,7 +346,8 @@ window.GAME_DATA = {
       "icon": "can",
       "color": "#f6a35b",
       "unit": "",
-      "step": 5
+      "step": 5,
+      "once": true
     },
     "lemonSlice": {
       "name": "レモン(切れ)",
@@ -351,7 +358,8 @@ window.GAME_DATA = {
       "icon": "round",
       "color": "#f7dd3e",
       "unit": "切れ",
-      "step": 1
+      "step": 1,
+      "once": true
     },
     "ice": {
       "name": "氷",
@@ -363,7 +371,8 @@ window.GAME_DATA = {
       "color": "#cfeaf5",
       "unit": "個",
       "step": 1,
-      "neutral": true
+      "neutral": true,
+      "once": true
     },
     "pudding": {
       "name": "プリン",
@@ -555,7 +564,8 @@ window.GAME_DATA = {
       "color": "#fbf1cf",
       "unit": "g",
       "step": 1,
-      "thickness": 2
+      "thickness": 2,
+      "once": true
     },
     "eggpaste": {
       "name": "タマゴペースト",
@@ -675,7 +685,8 @@ window.GAME_DATA = {
       "color": "#3f8f35",
       "unit": "g",
       "step": 0.1,
-      "thickness": 2
+      "thickness": 2,
+      "once": true
     },
     "consomme": {
       "name": "コンソメ粉末",
@@ -686,7 +697,8 @@ window.GAME_DATA = {
       "icon": "jar",
       "color": "#e3a84a",
       "unit": "g",
-      "step": 1
+      "step": 1,
+      "once": true
     },
     "egg": {
       "name": "タマゴ",
@@ -769,10 +781,7 @@ window.GAME_DATA = {
       "look": "ice",
       "items": {
         "aitora": 150,
-        "ice": [
-          5,
-          6
-        ]
+        "ice": null
       },
       "vessel": "ジャグ",
       "note": "アイトラ150はジャグに注ぎます。ジューグラには氷のみ5〜6個を入れます。"
@@ -794,7 +803,7 @@ window.GAME_DATA = {
       "look": "hot",
       "items": {
         "blend": null,
-        "whip": 25
+        "whip": null
       }
     },
     {
@@ -804,7 +813,7 @@ window.GAME_DATA = {
       "look": "ice",
       "items": {
         "drip": 130,
-        "whip": 25
+        "whip": null
       }
     },
     {
@@ -853,7 +862,7 @@ window.GAME_DATA = {
       "cat": "drink",
       "look": "hot",
       "items": {
-        "tea": 3,
+        "tea": null,
         "hotwater": 300
       }
     },
@@ -872,11 +881,11 @@ window.GAME_DATA = {
       "cat": "drink",
       "look": "hot",
       "items": {
-        "tea": 3,
+        "tea": null,
         "hotwater": 300,
         "mirabelle": 22.5,
-        "fruitmix": 50,
-        "lemonSlice": 1
+        "fruitmix": null,
+        "lemonSlice": null
       },
       "note": "カップにフルーツミックス50(1/2缶)とレモン1切れを入れます。"
     },
@@ -889,8 +898,8 @@ window.GAME_DATA = {
         "icetea": 110,
         "mirabelle": 15,
         "ice": null,
-        "fruitmix": 50,
-        "lemonSlice": 1
+        "fruitmix": null,
+        "lemonSlice": null
       },
       "note": "氷+フルーツミックス50(1/2缶)+レモン1切れ。"
     },
@@ -985,8 +994,8 @@ window.GAME_DATA = {
       "look": "hot",
       "items": {
         "milk": 160,
-        "cocoa": 6,
-        "sugar": 9
+        "cocoa": null,
+        "sugar": null
       }
     },
     {
@@ -1043,9 +1052,9 @@ window.GAME_DATA = {
       "look": "hot",
       "items": {
         "milk": 160,
-        "matcha": 5,
-        "whip": 25,
-        "matchaS": 0.1
+        "matcha": null,
+        "whip": null,
+        "matchaS": null
       },
       "note": "最後に抹茶粉0.1をふりかけます。"
     },
@@ -1058,7 +1067,7 @@ window.GAME_DATA = {
         "milk": 90,
         "matchaPrep": 55,
         "vanilla": null,
-        "matchaS": 0.1
+        "matchaS": null
       },
       "note": "最後に抹茶粉0.1をふりかけます。"
     },
@@ -1124,7 +1133,7 @@ window.GAME_DATA = {
       "items": {
         "lemonJ": 50,
         "soda": 110,
-        "lemonSlice": 1
+        "lemonSlice": null
       }
     },
     {
@@ -1166,7 +1175,7 @@ window.GAME_DATA = {
       "look": "dish",
       "items": {
         "pudding": null,
-        "whip": 25
+        "whip": null
       }
     },
     {
@@ -1177,8 +1186,57 @@ window.GAME_DATA = {
       "items": {
         "breadT": 0.5,
         "butter": 8,
-        "consomme": 4,
+        "consomme": null,
         "egg": 1
+      },
+      "cut": {
+        "scoreFirst": true,
+        "lines": [
+          {
+            "t": "score",
+            "a": [
+              0.25,
+              0
+            ],
+            "b": [
+              0.25,
+              1
+            ]
+          },
+          {
+            "t": "score",
+            "a": [
+              0.5,
+              0
+            ],
+            "b": [
+              0.5,
+              1
+            ]
+          },
+          {
+            "t": "score",
+            "a": [
+              0.75,
+              0
+            ],
+            "b": [
+              0.75,
+              1
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0,
+              0.4
+            ],
+            "b": [
+              1,
+              0.62
+            ]
+          }
+        ]
       }
     },
     {
@@ -1192,8 +1250,58 @@ window.GAME_DATA = {
         "mayo": 8,
         "eggpaste": 45,
         "ham": 2,
-        "consomme": 4
-      }
+        "consomme": null
+      },
+      "cut": {
+        "scoreFirst": false,
+        "lines": [
+          {
+            "t": "cut",
+            "a": [
+              0.06,
+              0
+            ],
+            "b": [
+              0.06,
+              1
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0.95,
+              0
+            ],
+            "b": [
+              0.95,
+              1
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0.375,
+              0
+            ],
+            "b": [
+              0.375,
+              1
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0.375,
+              0
+            ],
+            "b": [
+              0.9,
+              1
+            ]
+          }
+        ]
+      },
+      "note": "パンの耳の左右を切り落とし、3つにカットします。"
     },
     {
       "id": "morningC",
@@ -1206,7 +1314,7 @@ window.GAME_DATA = {
         "mustard": 8,
         "ham": 2,
         "cucumber": 3,
-        "consomme": 4,
+        "consomme": null,
         "egg": 1
       },
       "note": "スープ(コンソメ粉末4g)とゆで卵を添えます。",
@@ -1218,7 +1326,67 @@ window.GAME_DATA = {
         "キュウリ×3枚",
         "マスタード",
         "サンドパン(上)"
-      ]
+      ],
+      "cut": {
+        "scoreFirst": false,
+        "lines": [
+          {
+            "t": "cut",
+            "a": [
+              0.06,
+              0
+            ],
+            "b": [
+              0.06,
+              1
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0.94,
+              0
+            ],
+            "b": [
+              0.94,
+              1
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0,
+              0.06
+            ],
+            "b": [
+              1,
+              0.06
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0,
+              0.94
+            ],
+            "b": [
+              1,
+              0.94
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0,
+              0.42
+            ],
+            "b": [
+              1,
+              0.6
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "premium",
@@ -1234,8 +1402,8 @@ window.GAME_DATA = {
         "onion": 3,
         "tomato": 0.5,
         "caesar": 10,
-        "cheesePowder": 2,
-        "consomme": 4
+        "cheesePowder": null,
+        "consomme": null
       },
       "note": "グリーンリーフは葉の部分だけを、フリルが見えるよう縦に入れるときれいに見えます。オニオンスライスは散らすように盛ります。シーザードレッシング10g・パルメザンチーズ2g。",
       "stepsTitle": "下準備と作り方の順番",
@@ -1257,6 +1425,88 @@ window.GAME_DATA = {
       "items": {
         "breadT": 1,
         "butter": 8
+      },
+      "cut": {
+        "scoreFirst": true,
+        "lines": [
+          {
+            "t": "score",
+            "a": [
+              0,
+              0.12
+            ],
+            "b": [
+              1,
+              0.3
+            ]
+          },
+          {
+            "t": "score",
+            "a": [
+              0,
+              0.42
+            ],
+            "b": [
+              1,
+              0.6
+            ]
+          },
+          {
+            "t": "score",
+            "a": [
+              0,
+              0.72
+            ],
+            "b": [
+              1,
+              0.88
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0,
+              0.06
+            ],
+            "b": [
+              1,
+              0.06
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0,
+              0.36
+            ],
+            "b": [
+              1,
+              0.36
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0,
+              0.66
+            ],
+            "b": [
+              1,
+              0.66
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0,
+              0.94
+            ],
+            "b": [
+              1,
+              0.94
+            ]
+          }
+        ]
       }
     },
     {
@@ -1312,7 +1562,7 @@ window.GAME_DATA = {
       "look": "food",
       "items": {
         "stew": 1,
-        "parsley": 0.1,
+        "parsley": null,
         "portion": 1,
         "breadT": 0.5,
         "butter": 8,
@@ -1320,7 +1570,7 @@ window.GAME_DATA = {
         "onion": 3,
         "tomato": 0.5,
         "caesar": 10,
-        "cheesePowder": 2
+        "cheesePowder": null
       }
     },
     {
@@ -1383,7 +1633,56 @@ window.GAME_DATA = {
         "焼き上がったら、マヨネーズ3gをつなぎにしてサンドする",
         "パンの耳の左右を切り落とし、断面からキュウリが3枚見える向きで3つにカットする",
         "コレール皿に紙ナプキンを敷き、①を耳側を下にして皿の中央に置き、②も盛り付ける"
-      ]
+      ],
+      "cut": {
+        "scoreFirst": false,
+        "lines": [
+          {
+            "t": "cut",
+            "a": [
+              0.06,
+              0
+            ],
+            "b": [
+              0.06,
+              1
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0.94,
+              0
+            ],
+            "b": [
+              0.94,
+              1
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0.32,
+              0
+            ],
+            "b": [
+              0.32,
+              1
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0.49,
+              0
+            ],
+            "b": [
+              0.73,
+              1
+            ]
+          }
+        ]
+      }
     }
   ]
 };

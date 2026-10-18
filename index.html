@@ -57,6 +57,14 @@
     <button class="btn primary" data-act="rush">営業スタート</button>
   </div>
 
+  <div class="card mode">
+    <div>
+      <h3>伝票ラッシュ</h3>
+      <p>テーブルの伝票に並んだ品を、器選びから自分で判断してまとめて作ります。どの器に何を入れたかで判定します。伝票5枚で1回です。</p>
+    </div>
+    <button class="btn primary" data-act="mix">伝票ラッシュ開始</button>
+  </div>
+
   <div class="mode-grid">
     <button class="tile-btn" data-act="pick"><b>練習</b><span>メニューを選んで、ヒントを見ながら作ります</span></button>
     <button class="tile-btn" data-act="pickSteps"><b>手順ならべ</b><span>組み立てや仕上げの順番を並べ替えます</span></button>
@@ -84,13 +92,25 @@
   <div class="ticket">
     <div class="t-top"><span id="tBadge" class="badge"></span><span id="tSub"></span></div>
     <div class="t-name" id="tName"></div>
+    <ul class="t-list" id="tList" hidden></ul>
     <div class="timer" id="timer"><i id="timerBar"></i></div>
     <button class="hint-btn" id="hintBtn">ヒント</button>
   </div>
   <div class="hintbox" id="hintBox" hidden></div>
+  <div class="tray" id="tray" hidden></div>
   <div class="counter" id="counter">
-    <div class="vchoose" id="vChoose" hidden></div>
+    <div class="ctop">
+      <div class="seg" id="viewTog" hidden><button data-view="plate" aria-pressed="true">盛り付け</button><button data-view="cut" aria-pressed="false">カット</button></div>
+      <div class="vchoose" id="vChoose" hidden></div>
+      <button class="mini" id="contChange" hidden>器を変える</button>
+    </div>
+    <div class="contpick" id="contPick" hidden></div>
     <div class="vessel" id="vessel"></div>
+    <div class="cuttools" id="cutTools" hidden>
+      <button data-tool="score" aria-pressed="true"><svg viewBox="0 0 40 10" aria-hidden="true"><path d="M2 5H38" stroke="currentColor" stroke-width="4" stroke-dasharray="2 6" stroke-linecap="round"/></svg>切込み</button>
+      <button data-tool="cut" aria-pressed="false"><svg viewBox="0 0 40 10" aria-hidden="true"><path d="M2 5H38" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>カット</button>
+      <button data-act="cutUndo">1本戻す</button>
+    </div>
     <div class="chips" id="chips"></div>
   </div>
   <div class="shelf" id="shelf"></div>
@@ -124,7 +144,6 @@
     <button data-atab="recipes" aria-pressed="true">レシピ</button>
     <button data-atab="ings" aria-pressed="false">材料</button>
     <button data-atab="vessels" aria-pressed="false">器</button>
-    <button data-atab="data" aria-pressed="false">データ</button>
   </div>
   <div class="adm-body" id="admBody"></div>
 </section>

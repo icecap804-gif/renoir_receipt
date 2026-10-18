@@ -106,11 +106,11 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--ice);outline-of
 .shelf{flex:1;min-height:0;overflow-y:auto;margin-top:10px;padding:10px;background:rgba(255,255,255,.4);border:2.5px solid var(--ink);border-radius:18px}
 .shelf h4{margin:4px 2px 6px;font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--ink-2)}
 .shelf h4:not(:first-child){margin-top:12px}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;align-content:start}
 .bin{display:grid;justify-items:center;gap:2px;padding:6px 3px 7px;border-radius:14px;border:2.5px solid var(--ink);background:color-mix(in srgb,var(--c) 26%,#fff);box-shadow:0 3px 0 var(--ink);min-width:0}
 .bin:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
-.bin svg{width:40px;height:40px}
-.bin span{font-size:11px;font-weight:800;line-height:1.2;text-align:center;word-break:break-all}
+.bin svg{width:34px;height:34px}
+.bin span{font-size:10.5px;font-weight:800;line-height:1.2;text-align:center;word-break:break-all}
 .bin.on{outline:3px solid var(--accent);outline-offset:1px}
 .bin.bounce svg{animation:pop .3s ease}
 .actions{display:flex;gap:10px;padding-block:10px calc(10px + env(safe-area-inset-bottom,0px))}
@@ -122,6 +122,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--ice);outline-of
 .sheet-bg{position:absolute;inset:0;background:rgba(58,44,37,.12)}
 .sheet-card{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:min(540px,100%);background:var(--paper);border:2.5px solid var(--ink);border-bottom:0;border-radius:24px 24px 0 0;padding:14px max(16px,env(safe-area-inset-left,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-right,0px));display:grid;gap:12px;animation:up .2s ease}
 @keyframes up{from{transform:translate(-50%,40px);opacity:.4}}
+@keyframes rise{from{transform:translateY(40px);opacity:.4}}
 .sh-head{display:flex;align-items:center;gap:10px}
 .sh-head svg{width:40px;height:40px}
 .sh-head b{flex:1;font-size:18px;font-weight:800}
@@ -138,7 +139,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--ice);outline-of
 
 /* modal */
 .modal{position:fixed;inset:0;z-index:30;background:rgba(58,44,37,.45);display:flex;align-items:flex-end;justify-content:center}
-.modal-card{width:min(540px,100%);max-height:88%;overflow-y:auto;background:var(--paper);border:2.5px solid var(--ink);border-bottom:0;border-radius:26px 26px 0 0;padding:20px max(18px,env(safe-area-inset-left,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-right,0px));display:grid;gap:14px;animation:up .22s ease}
+.modal-card{width:min(540px,100%);max-height:88%;overflow-y:auto;background:var(--paper);border:2.5px solid var(--ink);border-bottom:0;border-radius:26px 26px 0 0;padding:20px max(18px,env(safe-area-inset-left,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-right,0px));display:grid;gap:14px;animation:rise .22s ease}
 .verdict{display:flex;align-items:center;gap:12px}
 .stamp{flex:none;width:64px;height:64px;border-radius:50%;border:4px solid currentColor;display:grid;place-items:center;font-size:30px;font-weight:800;transform:rotate(-8deg)}
 .stamp.ok{color:var(--ok)}.stamp.ng{color:var(--ng)}
@@ -188,7 +189,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--ice);outline-of
 .sum-list b{width:20px;font-weight:800}
 .sum-list span{flex:1}
 .sum-list i{font-style:normal;font-family:var(--f-dig)}
-@media (max-width:360px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.t-name{font-size:19px}}
+@media (max-width:360px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.t-name{font-size:19px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* ===== 編集画面 ===== */
@@ -237,3 +238,59 @@ textarea.in{min-height:84px;resize:vertical;line-height:1.6}
 .dot{width:10px;height:10px;border-radius:50%;background:var(--ok);flex:none}
 .dot.edited{background:var(--food)}
 .ta-code{font-family:ui-monospace,Menlo,monospace;font-size:12px;min-height:120px}
+
+/* ===== 材料棚:分類タブ ===== */
+.shelf{display:flex;flex-direction:column;gap:8px}
+.gtabs{display:flex;gap:6px;flex-wrap:wrap}
+.gtabs button{font-size:12.5px;font-weight:800;padding:6px 10px;border-radius:99px;border:2px solid var(--ink);background:var(--paper);display:flex;gap:5px;align-items:center}
+.gtabs button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.gtabs i{font-style:normal;font-size:11px;min-width:18px;height:18px;border-radius:99px;background:var(--accent);color:#fff;display:grid;place-items:center;padding:0 4px}
+.shelf-empty{margin:auto;color:var(--ink-2);font-weight:700;font-size:13px;text-align:center;line-height:1.7;padding:10px}
+
+/* ===== カウンター上部 ===== */
+.ctop{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;position:relative;z-index:2}
+.ctop:not(:has(:not([hidden]))){display:none}
+.seg{display:flex;background:rgba(255,255,255,.6);border:2px solid var(--ink);border-radius:12px;padding:3px;gap:3px}
+.seg button{font-size:13px;font-weight:800;padding:5px 12px;border-radius:9px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.mini{font-size:12px;font-weight:800;border:2px solid var(--ink);border-radius:10px;padding:5px 10px;background:var(--paper)}
+.contpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;position:relative;z-index:2;padding-block:4px}
+.contpick p{grid-column:1/-1;margin:0;text-align:center;font-weight:800;font-size:13px}
+.contpick button{display:grid;justify-items:center;gap:2px;background:var(--paper);border:2.5px solid var(--ink);border-radius:14px;padding:6px 4px;box-shadow:0 3px 0 var(--ink);font-size:12px;font-weight:800}
+.contpick button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.contpick svg{width:44px;height:44px}
+.contpick button[aria-pressed="true"]{background:#fff1e3;outline:3px solid var(--accent)}
+
+/* ===== カット ===== */
+.vessel svg.board{touch-action:none;cursor:crosshair}
+.cuttools{display:flex;gap:6px;justify-content:center;position:relative;z-index:2;flex-wrap:wrap}
+.cuttools button{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:800;border:2px solid var(--ink);border-radius:10px;padding:6px 10px;background:var(--paper)}
+.cuttools button svg{width:28px;height:8px;color:#2f6ea8}
+.cuttools button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.cuttools button[aria-pressed="true"] svg{color:#9fd0ff}
+.cutpair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cutpair figure{margin:0;display:grid;gap:4px;justify-items:center;font-size:12px;font-weight:800;color:var(--ink-2)}
+.cutpair svg{width:100%;max-width:150px;height:auto;background:#fff;border:2px solid var(--line);border-radius:12px}
+.cutmsg{font-size:13px;line-height:1.6;color:var(--ng);font-weight:700;margin:0}
+.board-edit{display:flex;justify-content:center;background:#fff;border:2px solid var(--ink);border-radius:14px;padding:6px}
+.board-edit svg{width:min(100%,280px);height:auto;touch-action:none;cursor:crosshair}
+.hint-cut{display:flex;gap:10px;align-items:center;margin-top:6px}
+.hint-cut svg{width:110px;height:110px;flex:none;background:#fff;border-radius:10px}
+.bcut{width:140px;height:140px;background:#fff;border-radius:12px;border:1.5px solid var(--line)}
+
+/* ===== 伝票ラッシュ ===== */
+.t-list{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:4px;padding-right:0}
+.t-list li{display:flex;gap:8px;align-items:center;font-size:16px;font-weight:800;border-bottom:1.5px dashed var(--line);padding-bottom:4px}
+.t-list li .badge{font-size:10px;flex:none}
+.tray{display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding:2px 2px 4px;scrollbar-width:none}
+.tray::-webkit-scrollbar{display:none}
+.tray button{flex:none;width:74px;display:grid;justify-items:center;gap:2px;background:var(--paper);border:2.5px solid var(--ink);border-radius:14px;padding:4px;font-size:10.5px;font-weight:800;line-height:1.2}
+.tray button svg{width:52px;height:52px}
+.tray button[aria-pressed="true"]{outline:3px solid var(--accent);outline-offset:1px;background:#fff1e3}
+.tray .add{border-style:dashed;background:rgba(255,255,255,.6);font-size:12px;justify-content:center;align-content:center;min-height:76px}
+.tray .add b{font-size:22px;line-height:1}
+.mixitem{display:grid;gap:8px;border:2px solid var(--line);border-radius:16px;padding:10px 12px;background:#fff}
+.mixitem h4{margin:0;display:flex;gap:8px;align-items:center;font-size:16px;font-weight:800}
+.mixitem h4 .m{font-size:18px}
+.mixitem.good h4 .m{color:var(--ok)}.mixitem.bad h4 .m{color:var(--ng)}
+.mixitem p{margin:0;font-size:13px;color:var(--ink-2)}
