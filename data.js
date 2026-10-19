@@ -5,7 +5,7 @@
   ・内容を変えたら version も別の文字(更新した日付など)に変えてください。
 */
 window.GAME_DATA = {
-  "version": "2026-10-19-3",
+  "version": "2026-10-19-5",
   "vessels": [
     {
       "name": "グラス",
@@ -377,7 +377,7 @@ window.GAME_DATA = {
     "pudding": {
       "name": "プリン",
       "cat": "drink",
-      "group": "トッピング",
+      "group": "デザート",
       "kind": "top",
       "vis": "pudding",
       "icon": "pudding",
@@ -534,7 +534,7 @@ window.GAME_DATA = {
       "icon": "sheet",
       "color": "#d9665a",
       "unit": "枚",
-      "step": 0.5,
+      "step": 1,
       "thickness": 5
     },
     "sliceCheese": {
@@ -756,6 +756,18 @@ window.GAME_DATA = {
       "unit": "g",
       "step": 5,
       "once": true
+    },
+    "applepie": {
+      "name": "アップルパイ",
+      "cat": "drink",
+      "group": "デザート",
+      "kind": "top",
+      "vis": "pie",
+      "icon": "pie",
+      "color": "#e9b46a",
+      "unit": "個",
+      "step": 1,
+      "once": true
     }
   },
   "recipes": [
@@ -767,7 +779,8 @@ window.GAME_DATA = {
       "items": {
         "blend": null,
         "hotwater": 30
-      }
+      },
+      "container": "ame"
     },
     {
       "id": "drip",
@@ -817,7 +830,8 @@ window.GAME_DATA = {
       "items": {
         "blend": null,
         "whip": null
-      }
+      },
+      "container": "ame"
     },
     {
       "id": "iwiener",
@@ -1069,7 +1083,8 @@ window.GAME_DATA = {
         "whip": null,
         "matchaS": null
       },
-      "note": "最後に抹茶粉0.1をふりかけます。"
+      "note": "最後に抹茶粉0.1をふりかけます。",
+      "container": "ame"
     },
     {
       "id": "imatcha",
@@ -1189,7 +1204,9 @@ window.GAME_DATA = {
       "items": {
         "pudding": null,
         "whip": null
-      }
+      },
+      "bake": "none",
+      "micro": 0
     },
     {
       "id": "morningA",
@@ -1208,33 +1225,44 @@ window.GAME_DATA = {
           {
             "t": "score",
             "a": [
-              0.25,
+              0.03,
               0
             ],
             "b": [
-              0.25,
+              0.03,
               1
             ]
           },
           {
             "t": "score",
             "a": [
-              0.5,
+              0.33,
               0
             ],
             "b": [
-              0.5,
+              0.33,
               1
             ]
           },
           {
             "t": "score",
             "a": [
-              0.75,
+              0.64,
               0
             ],
             "b": [
-              0.75,
+              0.64,
+              1
+            ]
+          },
+          {
+            "t": "score",
+            "a": [
+              0.94,
+              0
+            ],
+            "b": [
+              0.94,
               1
             ]
           },
@@ -1242,15 +1270,17 @@ window.GAME_DATA = {
             "t": "cut",
             "a": [
               0,
-              0.4
+              0.11
             ],
             "b": [
               1,
-              0.62
+              0.8
             ]
           }
         ]
-      }
+      },
+      "bake": "toast",
+      "micro": 0
     },
     {
       "id": "morningB",
@@ -1271,50 +1301,52 @@ window.GAME_DATA = {
           {
             "t": "cut",
             "a": [
-              0.06,
+              0.05,
               0
             ],
             "b": [
-              0.06,
+              0.05,
               1
             ]
           },
           {
             "t": "cut",
             "a": [
-              0.95,
+              0.33,
               0
             ],
             "b": [
-              0.95,
+              0.33,
               1
             ]
           },
           {
             "t": "cut",
             "a": [
-              0.375,
+              0.6,
               0
             ],
             "b": [
-              0.375,
+              0.74,
               1
             ]
           },
           {
             "t": "cut",
             "a": [
-              0.375,
+              0.96,
               0
             ],
             "b": [
-              0.9,
+              0.96,
               1
             ]
           }
         ]
       },
-      "note": "パンの耳の左右を切り落とし、3つにカットします。"
+      "note": "パンの耳の左右を切り落とし、3つにカットします。",
+      "bake": "toast",
+      "micro": 0
     },
     {
       "id": "morningC",
@@ -1346,22 +1378,22 @@ window.GAME_DATA = {
           {
             "t": "cut",
             "a": [
-              0.06,
+              0.05,
               0
             ],
             "b": [
-              0.06,
+              0.05,
               1
             ]
           },
           {
             "t": "cut",
             "a": [
-              0.94,
+              0.97,
               0
             ],
             "b": [
-              0.94,
+              0.97,
               1
             ]
           },
@@ -1369,37 +1401,50 @@ window.GAME_DATA = {
             "t": "cut",
             "a": [
               0,
-              0.06
+              0.075
             ],
             "b": [
               1,
-              0.06
+              0.075
             ]
           },
           {
             "t": "cut",
             "a": [
               0,
-              0.94
+              0.93
             ],
             "b": [
               1,
-              0.94
+              0.93
             ]
           },
           {
             "t": "cut",
             "a": [
               0,
-              0.42
+              0.35
             ],
             "b": [
               1,
-              0.6
+              0.35
+            ]
+          },
+          {
+            "t": "cut",
+            "a": [
+              0,
+              0.71
+            ],
+            "b": [
+              1,
+              0.59
             ]
           }
         ]
-      }
+      },
+      "bake": "none",
+      "micro": 0
     },
     {
       "id": "premium",
@@ -1428,7 +1473,8 @@ window.GAME_DATA = {
         "サラダにパルメザンチーズを振り、シーザードレッシングをかける",
         "モーニング用皿に、サラダ・スープ・トースト・ホワイトロースを置く",
         "ホワイトロースの横に、タマゴペースト(#18ディッシャーすりきり1杯)を乗せる"
-      ]
+      ],
+      "bake": "toast"
     },
     {
       "id": "toast",
@@ -1520,7 +1566,9 @@ window.GAME_DATA = {
             ]
           }
         ]
-      }
+      },
+      "bake": "toast",
+      "micro": 0
     },
     {
       "id": "honeytoast",
@@ -1604,7 +1652,9 @@ window.GAME_DATA = {
           }
         ]
       },
-      "note": "切込み2本を入れてからカット4本。トーストと違い、3つのうち1つには切込みを入れません。"
+      "note": "切込み2本を入れてからカット4本。トーストと違い、3つのうち1つには切込みを入れません。",
+      "bake": "toast",
+      "micro": 0
     },
     {
       "id": "mixsand",
@@ -1617,7 +1667,7 @@ window.GAME_DATA = {
         "mustard": null,
         "eggpaste": null,
         "cucumber": 3,
-        "bacon": 1,
+        "bacon": 2,
         "sliceCheese": 1,
         "tomato": 1,
         "leaf": null
@@ -1693,7 +1743,9 @@ window.GAME_DATA = {
           }
         ]
       },
-      "note": "耳を4辺とも切り落としてから、対角線を結んで4等分します。"
+      "note": "耳を4辺とも切り落としてから、対角線を結んで4等分します。",
+      "bake": "none",
+      "micro": 0
     },
     {
       "id": "saba",
@@ -1727,7 +1779,10 @@ window.GAME_DATA = {
           }
         ]
       },
-      "note": "真ん中で二等分します。"
+      "note": "真ん中で二等分します。",
+      "container": "big",
+      "bake": "open",
+      "micro": 0
     },
     {
       "id": "stew",
@@ -1774,7 +1829,10 @@ window.GAME_DATA = {
           }
         ]
       },
-      "note": "真ん中で二等分します。"
+      "note": "真ん中で二等分します。",
+      "container": "big",
+      "bake": "open",
+      "micro": 180
     },
     {
       "id": "teriyaki",
@@ -1794,27 +1852,29 @@ window.GAME_DATA = {
           {
             "t": "cut",
             "a": [
-              0.5,
+              0,
               0
             ],
             "b": [
-              0.5,
+              1,
               1
             ]
           },
           {
             "t": "cut",
             "a": [
-              0,
-              0.5
+              1,
+              0
             ],
             "b": [
-              1,
-              0.5
+              0,
+              1
             ]
           }
         ]
-      }
+      },
+      "bake": "toast",
+      "micro": 0
     },
     {
       "id": "pizza",
@@ -1827,7 +1887,7 @@ window.GAME_DATA = {
         "mayo": null,
         "shred": null,
         "piman": 3,
-        "bacon": 0.5
+        "bacon": 12
       },
       "cut": {
         "scoreFirst": false,
@@ -1878,7 +1938,10 @@ window.GAME_DATA = {
           }
         ]
       },
-      "note": "左右の耳だけを切り落とし、3等分します。"
+      "note": "左右の耳だけを切り落とし、3等分します。",
+      "container": "big",
+      "bake": "toast",
+      "micro": 40
     },
     {
       "id": "baconcheese",
@@ -1889,7 +1952,7 @@ window.GAME_DATA = {
         "breadT": 1,
         "mayo": null,
         "mustard": null,
-        "bacon": 1.5,
+        "bacon": 3,
         "cucumber": 3,
         "sliceCheese": 1
       },
@@ -1908,49 +1971,64 @@ window.GAME_DATA = {
           {
             "t": "cut",
             "a": [
-              0.06,
+              0.05,
               0
             ],
             "b": [
-              0.06,
+              0.05,
               1
             ]
           },
           {
             "t": "cut",
             "a": [
-              0.94,
+              0.33,
               0
             ],
             "b": [
-              0.94,
+              0.33,
               1
             ]
           },
           {
             "t": "cut",
             "a": [
-              0.32,
+              0.6,
               0
             ],
             "b": [
-              0.32,
+              0.74,
               1
             ]
           },
           {
             "t": "cut",
             "a": [
-              0.49,
+              0.96,
               0
             ],
             "b": [
-              0.73,
+              0.96,
               1
             ]
           }
         ]
-      }
+      },
+      "bake": "open",
+      "micro": 0
+    },
+    {
+      "id": "applepie",
+      "name": "アップルパイ",
+      "cat": "drink",
+      "look": "dish",
+      "items": {
+        "applepie": null,
+        "vanilla": null,
+        "whip": null
+      },
+      "bake": "none",
+      "micro": 90
     }
   ]
 };

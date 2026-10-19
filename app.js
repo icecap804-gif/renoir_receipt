@@ -72,6 +72,7 @@ function ico(shape, c) {
     case 'ball': p = `<path d="M10 32h28l-4 10H14Z" fill="#fff" ${s}/><circle cx="24" cy="23" r="12" fill="${c}" ${s}/>`; break;
     case 'can': p = `<ellipse cx="24" cy="12" rx="13" ry="4" fill="#d0d6d8" ${s}/><path d="M11 12v26q0 5 13 5t13-5V12" fill="#d0d6d8" ${s}/><rect x="11" y="19" width="26" height="14" fill="${c}"/><circle cx="19" cy="26" r="3" fill="#f05a5a"/><circle cx="28" cy="25" r="3" fill="#ffe14a"/>`; break;
     case 'pudding': p = `<path d="M8 40h32" ${s}/><path d="M14 39l4-24h12l4 24Z" fill="${c}" ${s}/><path d="M18 15h12l-1 6q-5 2-10 0Z" fill="#8a4a1c"/>`; break;
+    case 'pie': p = `<path d="M6 36L42 36L42 22L6 30Z" fill="${c}" ${s}/><path d="M6 30L42 22" stroke="#a85f1e" stroke-width="3"/>`; break;
     case 'bread': p = `<path d="M9 22q0-12 15-12t15 12q0 4-3 5v13H12V27q-3-1-3-5Z" fill="${c}" ${s}/><path d="M15 26h18v10H15Z" fill="#fff" opacity=".4"/>`; break;
     case 'leaf': p = `<path d="M10 38q-2-22 18-28q12-3 12-3q-2 14-8 22q-8 10-22 9Z" fill="${c}" ${s}/><path d="M12 36q10-10 22-24" fill="none" stroke="#fff" stroke-width="2" opacity=".7"/>`; break;
     case 'egg': p = `<ellipse cx="24" cy="26" rx="12" ry="15" fill="${c}" ${s}/>`; break;
@@ -88,21 +89,29 @@ const icoOf = g => ico(g.icon, g.color);
    cont は 'mug'(ホットカップ)'glass'(アイスグラス)'dish'(デザート皿)
    'plate'(フード皿)、または 'v:器の名前'(器タブで登録した器)。
    ========================================================= */
-function containers() {
-  return [{ id: 'mug', name: 'ホットカップ' }, { id: 'glass', name: 'アイスグラス' }, { id: 'dish', name: 'デザート皿' }, { id: 'plate', name: 'フード皿' }]
-    .concat(VESSELS.map(v => ({ id: 'v:' + v.name, name: v.name })));
-}
+const BASE_CONTS = [
+  { id: 'mug', name: 'ホットカップ' }, { id: 'ame', name: 'アメカップ' }, { id: 'glass', name: 'アイスグラス' },
+  { id: 'dish', name: 'ケーキ皿' }, { id: 'plate', name: 'コレール皿' }, { id: 'big', name: '大皿' }];
+function containers() { return BASE_CONTS.concat(VESSELS.map(v => ({ id: 'v:' + v.name, name: v.name }))); }
 function contName(id) { const c = containers().find(x => x.id === id); return c ? c.name : '—'; }
-const contCat = id => id === 'plate' ? 'food' : 'drink';
-function expectedCont(r) { if (r.cat === 'food') return 'plate'; if (r.look === 'dish') return 'dish'; if (r.vessel) return 'v:' + r.vessel; return r.look === 'hot' ? 'mug' : 'glass'; }
-function contShape(id) { if (id === 'mug' || id === 'glass') return id; if (id && id.startsWith('v:')) { const v = VESSELS.find(x => 'v:' + x.name === id); return v ? v.shape : 'rock'; } return null; }
-const newBuild = cont => ({ cont, added: {}, seq: [], cuts: [], view: 'plate' });
+const contCat = id => (id === 'plate' || id === 'big') ? 'food' : 'drink';
+const canHeat = id => id === 'plate' || id === 'big' || id === 'dish';
+function expectedCont(r) { if (r.container) return r.container; if (r.cat === 'food') return 'plate'; if (r.look === 'dish') return 'dish'; if (r.vessel) return 'v:' + r.vessel; return r.look === 'hot' ? 'mug' : 'glass'; }
+function contShape(id) { if (id === 'mug' || id === 'glass' || id === 'ame') return id; if (id && id.startsWith('v:')) { const v = VESSELS.find(x => 'v:' + x.name === id); return v ? v.shape : 'rock'; } return null; }
+const newBuild = cont => ({ cont, added: {}, seq: [], cuts: [], view: 'plate', bake: 'none', micro: 0 });
+// 加熱(トースター・レンジ)
+const BAKES = [['none', 'なし'], ['toast', '焼く'], ['open', '開き焼']];
+// レンジの選択肢は、レシピに書かれた秒数から作る
+const microChoices = () => [0, ...new Set(R.map(r => r.micro).filter(Boolean))].sort((a, b) => a - b);
+const bakeTxt = v => ({ none: '焼かない', toast: '焼く', open: '開き焼' })[v || 'none'];
+const microTxt = v => !v ? '使わない' : v >= 60 && v % 60 === 0 ? `${v / 60}分` : `${v}秒`;
 
 const GEO = {
   mug: { out: 'M52 70h104v104q0 24-24 24H76q-24 0-24-24Z', inn: 'M58 76h92v97q0 19-19 19H77q-19 0-19-19Z', top: 76, bot: 192, cap: 330, hl: 66, extra: '<path d="M156 92h12q18 0 18 22t-18 22h-12" fill="none" stroke="#3a2c25" stroke-width="5"/>' },
   glass: { out: 'M58 34h104l-12 166q-.4 6-6 6H76q-5.6 0-6-6Z', inn: 'M64 40h92l-11 158H75Z', top: 40, bot: 198, cap: 280, hl: 72 },
   rock: { out: 'M44 108h132l-7 92q-.4 6-6 6H57q-5.6 0-6-6Z', inn: 'M50 114h120l-6 84H56Z', top: 114, bot: 198, cap: 200, hl: 58 },
   tumbler: { out: 'M68 22h84l-6 178q-.2 6-6 6H80q-5.8 0-6-6Z', inn: 'M74 28h72l-5 170H79Z', top: 28, bot: 198, cap: 260, hl: 82 },
+  ame: { out: 'M68 46h84v124q0 24-24 24H92q-24 0-24-24Z', inn: 'M74 52h72v117q0 19-19 19H93q-19 0-19-19Z', top: 52, bot: 188, cap: 300, hl: 82, extra: '<path d="M152 70h10q16 0 16 22t-16 22h-10" fill="none" stroke="#3a2c25" stroke-width="5"/><ellipse cx="110" cy="200" rx="72" ry="9" fill="#fff" stroke="#3a2c25" stroke-width="4"/>' },
   jug: { out: 'M62 52h84l14-10 4 6-10 12v118q0 22-22 22H84q-22 0-22-22Z', inn: 'M68 60h80v118q0 16-16 16H84q-16 0-16-16Z', top: 60, bot: 194, cap: 320, hl: 76, extra: '<path d="M62 80h-10q-14 0-14 20v30q0 18 14 18h10" fill="none" stroke="#3a2c25" stroke-width="5"/>' }
 };
 function orderKeys(b) { const am = b.added; const ks = b.seq.filter(k => am[k] > 0 && ING[k]); for (const k in am) if (am[k] > 0 && ING[k] && !ks.includes(k)) ks.push(k); return ks; }
@@ -141,13 +150,17 @@ function dishSVG(b) {
   let s = `<ellipse cx="110" cy="182" rx="90" ry="22" fill="#fff" stroke="#3a2c25" stroke-width="4"/><ellipse cx="110" cy="179" rx="60" ry="12" fill="#f2ede4"/>`;
   let ty = 176;
   const pud = ks.find(k => ING[k].vis === 'pudding');
+  const pie = ks.find(k => ING[k].vis === 'pie');
+  if (pie && !pud) { s += `<path d="M62 176L158 176L158 144L62 166Z" fill="${ING[pie].color}" stroke="#3a2c25" stroke-width="4" stroke-linejoin="round"/><path d="M62 166L158 144" stroke="#c27a2c" stroke-width="6"/><path d="M84 170l10-4M108 166l10-4M132 160l10-4" stroke="#a85f1e" stroke-width="3" stroke-linecap="round"/>`; ty = 150; }
   if (pud) { s += `<path d="M76 176L88 118H132L144 176Z" fill="${ING[pud].color}" stroke="#3a2c25" stroke-width="4" stroke-linejoin="round"/><path d="M88 118H132L129.6 130Q110 137 90.4 130Z" fill="#8a4a1c"/>`; ty = 118; }
-  s += toppings(ks, ty, 160, 150);
+  s += toppings(ks, ty, 160, 150) + heatLabel(b, 110, 24);
   return `<svg viewBox="0 0 220 220">${s}</svg>`;
 }
 function plateSVG(b) {
   const ks = orderKeys(b), am = b.added;
-  let s = `<ellipse cx="124" cy="182" rx="94" ry="26" fill="#fff" stroke="#3a2c25" stroke-width="4"/><ellipse cx="124" cy="179" rx="66" ry="15" fill="#f2ede4"/>`;
+  const big = b.cont === 'big';
+  let s = big ? `<ellipse cx="124" cy="184" rx="112" ry="30" fill="#fff" stroke="#3a2c25" stroke-width="4"/><ellipse cx="124" cy="181" rx="84" ry="19" fill="#f2ede4"/>`
+    : `<ellipse cx="124" cy="182" rx="94" ry="26" fill="#fff" stroke="#3a2c25" stroke-width="4"/><ellipse cx="124" cy="179" rx="66" ry="15" fill="#f2ede4"/>`;
   const lay = ks.filter(k => ING[k].kind === 'layer');
   const reps = k => ING[k].vis === 'bread' ? Math.min(2, Math.max(1, Math.ceil(am[k]))) : 1;
   const tot = lay.reduce((a, k) => a + ING[k].thickness * reps(k), 0);
@@ -159,13 +172,14 @@ function plateSVG(b) {
     const g = ING[k];
     for (let rp = 0; rp < reps(k); rp++) {
       const h = Math.max(2, g.thickness * sc), w = g.vis === 'bread' ? (am[k] < 1 ? 84 : 130) : baseW - 6, x = 124 - w / 2; y -= h;
-      if (g.vis === 'bread') s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="${g.color}" stroke="#a8692b" stroke-width="3"/>`;
+      if (g.vis === 'bread') s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="${b.bake && b.bake !== 'none' ? '#d9944a' : g.color}" stroke="#a8692b" stroke-width="3"/>`;
       else if (g.vis === 'dots') { const n = Math.max(2, Math.floor(w / 22)); for (let i = 0; i < n; i++) s += `<ellipse cx="${x + 11 + i * (w - 22) / (n - 1)}" cy="${y + h / 2}" rx="11" ry="${Math.max(2, h / 2 + 1)}" fill="${g.color}" stroke="#3a2c25" stroke-width="1.6"/>`; }
       else if (g.vis === 'wave') { let d = `M${x - 6} ${y + h}`; for (let i = 0; i <= 8; i++) d += ` Q${x - 6 + i * (w + 12) / 8 - ((w + 12) / 16)} ${y - 3} ${x - 6 + i * (w + 12) / 8} ${y + h / 2}`; s += `<path d="${d} L${x + w + 6} ${y + h}Z" fill="${g.color}" stroke="#3a2c25" stroke-width="1.6"/>`; }
       else s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${Math.min(h / 2, 5)}" fill="${g.color}" stroke="#3a2c25" stroke-width="1.6"/>`;
     }
   });
-  if (b.cuts && b.cuts.length && lay.length) s += `<text x="124" y="${Math.max(16, y - 8)}" text-anchor="middle" font-size="13" font-weight="800" fill="#3a2c25">カット済み ${b.cuts.length}本</text>`;
+  if (b.cuts && b.cuts.length && lay.length) s += `<text x="124" y="${Math.max(34, y - 8)}" text-anchor="middle" font-size="13" font-weight="800" fill="#3a2c25">カット済み ${b.cuts.length}本</text>`;
+  s += heatLabel(b, 124, 18);
   const pos = [[30, 150], [30, 96], [214, 108], [214, 152], [124, 40], [70, 40], [178, 40]];
   ks.filter(k => ING[k].kind === 'side').forEach((k, i) => {
     const [x, yy] = pos[i % pos.length], g = ING[k];
@@ -178,16 +192,21 @@ function plateSVG(b) {
   });
   return `<svg viewBox="0 0 240 220">${s}</svg>`;
 }
+function heatLabel(b, x, y) {
+  const t = [b.bake && b.bake !== 'none' ? (b.bake === 'open' ? '開き焼き済み' : '焼き済み') : '', b.micro ? `レンジ${microTxt(b.micro)}` : ''].filter(Boolean).join('・');
+  return t ? `<text x="${x}" y="${y}" text-anchor="middle" font-size="13" font-weight="800" fill="#c94f2f">${t}</text>` : '';
+}
 function buildSVG(b, idp) {
   if (!b || !b.cont) return placeholderSVG();
-  if (b.cont === 'plate') return plateSVG(b);
+  if (b.cont === 'plate' || b.cont === 'big') return plateSVG(b);
   if (b.cont === 'dish') return dishSVG(b);
   const key = contShape(b.cont);
   return GEO[key] ? drinkSVG(b, key, idp) : placeholderSVG();
 }
 function contIcon(id) {
-  if (id === 'plate') return `<svg viewBox="0 0 220 220"><ellipse cx="110" cy="150" rx="96" ry="34" fill="#fff" stroke="#3a2c25" stroke-width="9"/><rect x="62" y="96" width="96" height="44" rx="10" fill="#f0c98a" stroke="#a8692b" stroke-width="8"/></svg>`;
-  if (id === 'dish') return `<svg viewBox="0 0 220 220"><ellipse cx="110" cy="170" rx="96" ry="30" fill="#fff" stroke="#3a2c25" stroke-width="9"/><path d="M74 166L88 104H132L146 166Z" fill="#f5c74e" stroke="#3a2c25" stroke-width="8"/></svg>`;
+  if (id === 'plate') return `<svg viewBox="0 0 220 220"><ellipse cx="110" cy="140" rx="86" ry="34" fill="#fff" stroke="#3a2c25" stroke-width="9"/><ellipse cx="110" cy="136" rx="54" ry="18" fill="#f2ede4"/></svg>`;
+  if (id === 'big') return `<svg viewBox="0 0 220 220"><ellipse cx="110" cy="140" rx="106" ry="44" fill="#fff" stroke="#3a2c25" stroke-width="9"/><ellipse cx="110" cy="136" rx="70" ry="24" fill="#f2ede4"/></svg>`;
+  if (id === 'dish') return `<svg viewBox="0 0 220 220"><ellipse cx="110" cy="150" rx="78" ry="26" fill="#fff" stroke="#3a2c25" stroke-width="9"/><path d="M84 146L96 100H124L136 146Z" fill="#f5c74e" stroke="#3a2c25" stroke-width="8"/></svg>`;
   const G = GEO[contShape(id)] || GEO.glass;
   return `<svg viewBox="0 0 220 220"><path d="${G.out}" fill="#fff" stroke="#3a2c25" stroke-width="9" stroke-linejoin="round"/>${(G.extra || '').replace('stroke-width="5"', 'stroke-width="9"')}</svg>`;
 }
@@ -292,7 +311,7 @@ const X = { tickets: [], ti: 0, made: [], table: 1 };   // 実践編
 function binHTML(k) { const g = ING[k], b = S.build; return `<button type="button" class="bin${b && b.added[k] > 0 ? ' on' : ''}" data-ing="${k}" style="--c:${esc(g.color)}">${icoOf(g)}<span>${esc(g.name)}</span></button>`; }
 function renderShelf() {
   const b = S.build, el = $('#shelf');
-  el.hidden = S.mode === 'mix' && (!b || S.picking);
+  el.hidden = !b || S.picking;
   if (!b || !b.cont || S.picking) { el.innerHTML = `<p class="shelf-empty">${S.mode === 'mix' ? '作る品の器かお皿を選ぶと、ここに材料が並びます。' : '先に器を選んでください。'}</p>`; return; }
   const cat = contCat(b.cont), groups = shelfGroups(cat);
   if (!groups.length) { el.innerHTML = '<p class="shelf-empty">この棚には材料がありません。</p>'; return; }
@@ -308,11 +327,11 @@ function renderChips() {
   if (b.cuts.length) html += `<button class="chip" data-view="cut">切り方<i>${b.cuts.length}本</i></button>`;
   $('#chips').innerHTML = html || `<span class="empty">${b.view === 'cut' ? 'パンの上を指でなぞると線が入ります' : '下の棚から材料をタップして入れてください'}</span>`;
 }
-function canCut(b) { return b && b.cont === 'plate' && (S.mode === 'mix' || hasCut(S.recipe)); }
+function canCut(b) { return b && contCat(b.cont) === 'food' && (S.mode === 'mix' || hasCut(S.recipe)); }
 function renderCounter(pop) {
   const b = S.build, box = $('#vessel'), r = S.recipe;
-  // 器の選択(実践編:新しい品/器を変える)
-  const picking = S.mode === 'mix' && (!b || S.picking);
+  // 器の選択(新しい品/器を変える)
+  const picking = !b || S.picking;
   $('#contPick').hidden = !picking;
   if (picking) {
     $('#contPick').innerHTML = `<p>${b ? '器を選び直してください' : '作る品の器・お皿を選んでください'}</p>` + containers().map(c => `<button data-cont="${esc(c.id)}" aria-pressed="${b && b.cont === c.id}">${contIcon(c.id)}${esc(c.name)}</button>`).join('');
@@ -322,10 +341,15 @@ function renderCounter(pop) {
   if (b && !cut) b.view = 'plate';
   $('#viewTog').hidden = !cut;
   if (cut) document.querySelectorAll('#viewTog button').forEach(x => x.setAttribute('aria-pressed', x.dataset.view === b.view));
-  $('#vChoose').hidden = !(S.mode !== 'mix' && r && r.vessel);
-  if (!$('#vChoose').hidden) $('#vChoose').innerHTML = `<span>器:</span>` + VESSELS.map(v => `<button data-vessel="${esc(v.name)}" aria-pressed="${b.cont === 'v:' + v.name}">${esc(v.name)}</button>`).join('');
-  $('#contChange').hidden = !(S.mode === 'mix' && b && !S.picking);
-  if (!$('#contChange').hidden) $('#contChange').textContent = `${contName(b.cont)} ▸ 器を変える`;
+  $('#vChoose').hidden = true;
+  const heat = !picking && canHeat(b.cont);
+  $('#bakeBtn').hidden = $('#microBtn').hidden = !heat;
+  if (heat) {
+    $('#bakeBtn').textContent = `トースター:${BAKES.find(x => x[0] === b.bake)[1]}`; $('#bakeBtn').classList.toggle('on', b.bake !== 'none');
+    $('#microBtn').textContent = `レンジ:${b.micro ? microTxt(b.micro) : 'なし'}`; $('#microBtn').classList.toggle('on', !!b.micro);
+  }
+  $('#contChange').hidden = !(b && !S.picking);
+  if (!$('#contChange').hidden) $('#contChange').textContent = `${contName(b.cont)} ▸ 変える`;
   const ctop = $('#counter .ctop'); ctop.hidden = [...ctop.children].every(c => c.hidden);
   // 器 or まな板
   box.hidden = picking;
@@ -379,8 +403,7 @@ function renderKitchen() { renderTicket(); renderTray(); renderCounter(); render
 /* ---------- 練習(1品ずつ) ---------- */
 function startOrder(r) {
   S.tool = 'cut';
-  S.recipe = r; S.picking = false;
-  S.build = newBuild(r.vessel && r.cat !== 'food' && r.look !== 'dish' ? null : expectedCont(r));
+  S.recipe = r; S.picking = true; S.build = null;
   renderKitchen(); show('kitchen'); $('#kitchen').scrollTop = 0;
   startTimer(r.cat === 'food' ? 90 : 60);
 }
@@ -446,17 +469,21 @@ function judgeBuild(r, b, checkCont) {
   for (const k in b.added) if (!(k in r.items) && b.added[k] > 0 && ING[k] && !ING[k].neutral) { rows.push({ k, exp: 0, got: b.added[k], good: false }); ok = false; }
   let contOk = true; const needCont = checkCont || !!r.vessel;
   if (needCont) { contOk = b.cont === expectedCont(r); if (!contOk) ok = false; }
+  const heat = [];
+  if ('bake' in r) { const g = (b.bake || 'none') === r.bake; heat.push({ label: 'トースター', exp: bakeTxt(r.bake), got: bakeTxt(b.bake), good: g }); if (!g) ok = false; }
+  if ('micro' in r) { const g = (b.micro || 0) === r.micro; heat.push({ label: 'レンジ', exp: microTxt(r.micro), got: microTxt(b.micro), good: g }); if (!g) ok = false; }
   const cut = hasCut(r) ? judgeCuts(r.cut, b.cuts || []) : null;
   if (cut && !cut.ok) ok = false;
-  const good = rows.filter(x => x.good).length + (needCont && contOk ? 1 : 0) + (cut && cut.ok ? 1 : 0);
-  const total = Object.keys(r.items).length + (needCont ? 1 : 0) + (cut ? 1 : 0);
-  return { ok, rows, contOk, needCont, cut, good, total };
+  const good = rows.filter(x => x.good).length + (needCont && contOk ? 1 : 0) + (cut && cut.ok ? 1 : 0) + heat.filter(x => x.good).length;
+  const total = Object.keys(r.items).length + (needCont ? 1 : 0) + (cut ? 1 : 0) + heat.length;
+  return { ok, rows, contOk, needCont, cut, heat, good, total };
 }
 function expTxt(k, exp) { if (exp === 0) return 'なし'; if (exp === null) return '入れる'; return amtTxt(k, exp); }
 function gotTxt(k, got) { if (!got) return '—'; if (isOnce(k)) return '入れた'; return amtTxt(k, got); }
 function resultDetail(r, b, res) {
   let rows = res.rows.map(x => `<tr class="${x.good ? 'good' : 'bad'}"><td class="m">${x.good ? '○' : '×'}</td><td>${esc(ingName(x.k))}</td><td class="ans">${esc(expTxt(x.k, x.exp))}</td><td class="you">${esc(gotTxt(x.k, x.got))}</td></tr>`).join('');
   if (res.needCont) rows = `<tr class="${res.contOk ? 'good' : 'bad'}"><td class="m">${res.contOk ? '○' : '×'}</td><td>器</td><td class="ans">${esc(contName(expectedCont(r)))}</td><td class="you">${esc(b.cont ? contName(b.cont) : '—')}</td></tr>` + rows;
+  rows += res.heat.map(x => `<tr class="${x.good ? 'good' : 'bad'}"><td class="m">${x.good ? '○' : '×'}</td><td>${x.label}</td><td class="ans">${esc(x.exp)}</td><td class="you">${esc(x.got)}</td></tr>`).join('');
   if (res.cut) rows += `<tr class="${res.cut.ok ? 'good' : 'bad'}"><td class="m">${res.cut.ok ? '○' : '×'}</td><td>切り方</td><td class="ans" colspan="2">${res.cut.ok ? '正しく切れています' : '下の図を確認'}</td></tr>`;
   let html = `<table class="rtable"><thead><tr><th></th><th>材料</th><th>正解</th><th>あなた</th></tr></thead><tbody>${rows}</tbody></table>`;
   if (res.cut) html += `${res.cut.msgs.length ? `<p class="cutmsg">${res.cut.msgs.map(esc).join('<br>')}</p>` : ''}<div class="cutpair"><figure>${boardSVG(res.cut.lines, { bread: breadOf(r), numbers: r.cut.scoreFirst })}<figcaption>正解</figcaption></figure><figure>${boardSVG(b.cuts, { bread: breadOf(r), numbers: r.cut.scoreFirst, color: res.cut.ok ? '#36985a' : '#d94b37' })}<figcaption>あなた</figcaption></figure></div>`;
@@ -466,7 +493,7 @@ function serve(auto) {
   if (!$('#modal').hidden) return;
   if (S.mode === 'mix') return serveMix(auto);
   stopTimer(); closeSheet();
-  const r = S.recipe, b = S.build, res = judgeBuild(r, b, false);
+  const r = S.recipe, b = S.build || newBuild(null), res = judgeBuild(r, b, true);
   record(r.id, res.ok);
   const left = Math.max(0, (S.tEnd - performance.now()) / 1000);
   const pts = res.ok ? 100 + Math.ceil(left) * 2 : Math.round(res.good / Math.max(1, res.total) * 40);
@@ -514,12 +541,15 @@ function startTicket() {
 function selectTray(i) { S.build = X.made[i]; S.picking = false; renderTray(); renderCounter(); renderShelf(); }
 function pickCont(id) {
   const b = S.build;
-  if (b && S.picking && X.made.includes(b)) {   // 器を変える
+  if (b && S.picking) {   // 器を変える
     if (contCat(b.cont) !== contCat(id)) { b.added = {}; b.seq = []; b.cuts = []; }
+    if (!canHeat(id)) { b.bake = 'none'; b.micro = 0; }
     b.cont = id;
-  } else {
+  } else if (S.mode === 'mix') {
     if (X.made.length >= MAX_TRAY) return;
     S.build = newBuild(id); X.made.push(S.build); S.tool = 'cut';
+  } else {
+    S.build = newBuild(id); S.tool = 'cut';
   }
   S.picking = false; renderTray(); renderCounter(true); renderShelf();
 }
@@ -572,7 +602,7 @@ function renderBook() {
   const list = R.filter(r => q ? (r.name.includes(q) || Object.keys(r.items).some(k => ingName(k).includes(q))) : tabOf(r) === bookTab);
   $('#bookTabs').style.opacity = q ? '.4' : '1';
   $('#bookList').innerHTML = list.length ? list.map(r => `<div class="bcard"><div class="bhead">${badge(r)}<b>${esc(r.name)}</b>${lvTag(r.id)}</div>
-    <ul class="ings">${r.vessel ? `<li><span>器</span><i>${esc(r.vessel)}</i></li>` : ''}${Object.entries(r.items).map(([k, v]) => `<li><span>${esc(ingName(k))}</span><i>${esc(amtTxt(k, v)) || '○'}</i></li>`).join('')}</ul>
+    <ul class="ings"><li><span>器</span><i>${esc(contName(expectedCont(r)))}</i></li>${'bake' in r ? `<li><span>トースター</span><i>${bakeTxt(r.bake)}</i></li>` : ''}${'micro' in r ? `<li><span>レンジ</span><i>${microTxt(r.micro)}</i></li>` : ''}${Object.entries(r.items).map(([k, v]) => `<li><span>${esc(ingName(k))}</span><i>${esc(amtTxt(k, v)) || '○'}</i></li>`).join('')}</ul>
     ${hasCut(r) ? `<div class="hint-cut">${boardSVG(r.cut.lines, { bread: breadOf(r), numbers: r.cut.scoreFirst, cls: 'bcut' })}<span class="bnote">点線:切込み<br>実線:カット${r.cut.scoreFirst ? '<br>切込みを全部入れてからカット' : ''}${r.cut.anyTurn ? '<br>向きは問わない' : ''}</span></div>` : ''}
     ${r.steps && r.steps.length ? `<div class="st-sub" style="font-weight:800">${esc(r.stepsTitle || '手順')}</div><ol>${r.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>` : ''}
     ${r.note ? `<p class="bnote">${esc(r.note)}</p>` : ''}</div>`).join('') : `<p class="foot">${q ? `「${esc(q)}」に当てはまるメニューはありません。` : 'このタブにはメニューがありません。'}</p>`;
@@ -593,7 +623,6 @@ document.addEventListener('click', e => {
   // キッチン
   if (d.ing) { openMeasure(d.ing); return; }
   if (d.group) { const b = S.build; if (b) { S.group[contCat(b.cont)] = d.group; renderShelf(); } return; }
-  if (d.vessel) { S.build.cont = 'v:' + d.vessel; renderCounter(true); renderShelf(); return; }
   if (d.cont) { pickCont(d.cont); return; }
   if (d.tray !== undefined) { selectTray(+d.tray); return; }
   if (d.view) { if (S.build) { S.build.view = d.view; renderCounter(); } return; }
@@ -611,6 +640,8 @@ document.addEventListener('click', e => {
     case 'cutUndo': if (S.build && S.build.cuts.length) { S.build.cuts.pop(); renderCounter(); renderTray(); } break;
   }
 });
+$('#bakeBtn').onclick = () => { const b = S.build; if (!b) return; const i = BAKES.findIndex(x => x[0] === b.bake); b.bake = BAKES[(i + 1) % BAKES.length][0]; renderCounter(true); renderTray(); };
+$('#microBtn').onclick = () => { const b = S.build; if (!b) return; const M = microChoices(), i = M.indexOf(b.micro || 0); b.micro = M[(i + 1) % M.length]; renderCounter(true); renderTray(); };
 $('#contChange').onclick = () => { S.picking = true; renderCounter(); renderShelf(); renderTray(); };
 
 // キッチン操作
@@ -621,7 +652,7 @@ $('#resetBtn').onclick = () => {
     X.made.splice(X.made.indexOf(S.build), 1); S.build = null; S.picking = true;
     renderTray(); renderCounter(); renderShelf(); return;
   }
-  const b = S.build; b.added = {}; b.seq = []; b.cuts = []; b.view = 'plate'; renderCounter(); renderShelf();
+  const b = S.build; if (!b) return; b.added = {}; b.seq = []; b.cuts = []; b.view = 'plate'; b.bake = 'none'; b.micro = 0; renderCounter(); renderShelf(); renderTray();
 };
 $('#quitBtn').onclick = () => {
   const b = $('#quitBtn');

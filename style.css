@@ -272,3 +272,5 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--ice);outline-of
   #kitchen.mix .tray button svg{width:34px;height:34px}
 }
 @media (max-height:700px){#kitchen.mix .vessel{height:84px}}
+/* 加熱ボタン */
+.mini.heat.on{background:var(--accent);color:#fff}
