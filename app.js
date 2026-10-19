@@ -90,14 +90,16 @@ const icoOf = g => ico(g.icon, g.color);
    'plate'(フード皿)、または 'v:器の名前'(器タブで登録した器)。
    ========================================================= */
 const BASE_CONTS = [
-  { id: 'mug', name: 'ホットカップ' }, { id: 'ame', name: 'アメカップ' }, { id: 'glass', name: 'アイスグラス' },
-  { id: 'dish', name: 'ケーキ皿' }, { id: 'plate', name: 'コレール皿' }, { id: 'big', name: '大皿' }];
+  { id: 'mug', name: 'ホットカップ' }, { id: 'ame', name: 'アメカップ' }, { id: 'tea', name: 'ティーカップ' },
+  { id: 'glass', name: 'ジュースグラス' }, { id: 'parfait', name: 'パフェグラス' },
+  { id: 'dish', name: 'ケーキ皿' }, { id: 'plate', name: 'コレール皿' }, { id: 'big', name: '大皿' }, { id: 'tray', name: 'プレート皿' }];
 function containers() { return BASE_CONTS.concat(VESSELS.map(v => ({ id: 'v:' + v.name, name: v.name }))); }
 function contName(id) { const c = containers().find(x => x.id === id); return c ? c.name : '—'; }
-const contCat = id => (id === 'plate' || id === 'big') ? 'food' : 'drink';
-const canHeat = id => id === 'plate' || id === 'big' || id === 'dish';
+const FOOD_CONTS = ['plate', 'big', 'tray'];
+const contCat = id => FOOD_CONTS.includes(id) ? 'food' : 'drink';
+const canHeat = id => FOOD_CONTS.includes(id) || id === 'dish';
 function expectedCont(r) { if (r.container) return r.container; if (r.cat === 'food') return 'plate'; if (r.look === 'dish') return 'dish'; if (r.vessel) return 'v:' + r.vessel; return r.look === 'hot' ? 'mug' : 'glass'; }
-function contShape(id) { if (id === 'mug' || id === 'glass' || id === 'ame') return id; if (id && id.startsWith('v:')) { const v = VESSELS.find(x => 'v:' + x.name === id); return v ? v.shape : 'rock'; } return null; }
+function contShape(id) { if (['mug', 'glass', 'ame', 'tea', 'parfait'].includes(id)) return id; if (id && id.startsWith('v:')) { const v = VESSELS.find(x => 'v:' + x.name === id); return v ? v.shape : 'rock'; } return null; }
 const newBuild = cont => ({ cont, added: {}, seq: [], cuts: [], view: 'plate', bake: 'none', micro: 0 });
 // 加熱(トースター・レンジ)
 const BAKES = [['none', 'なし'], ['toast', '焼く'], ['open', '開き焼']];
@@ -112,6 +114,8 @@ const GEO = {
   rock: { out: 'M44 108h132l-7 92q-.4 6-6 6H57q-5.6 0-6-6Z', inn: 'M50 114h120l-6 84H56Z', top: 114, bot: 198, cap: 200, hl: 58 },
   tumbler: { out: 'M68 22h84l-6 178q-.2 6-6 6H80q-5.8 0-6-6Z', inn: 'M74 28h72l-5 170H79Z', top: 28, bot: 198, cap: 260, hl: 82 },
   ame: { out: 'M68 46h84v124q0 24-24 24H92q-24 0-24-24Z', inn: 'M74 52h72v117q0 19-19 19H93q-19 0-19-19Z', top: 52, bot: 188, cap: 300, hl: 82, extra: '<path d="M152 70h10q16 0 16 22t-16 22h-10" fill="none" stroke="#3a2c25" stroke-width="5"/><ellipse cx="110" cy="200" rx="72" ry="9" fill="#fff" stroke="#3a2c25" stroke-width="4"/>' },
+  tea: { out: 'M36 104h148q-4 62-54 74H90q-50-12-54-74Z', inn: 'M42 110h136q-5 52-49 62H91q-44-10-49-62Z', top: 110, bot: 172, cap: 170, hl: 56, extra: '<path d="M182 116h6q16 0 14 18t-24 22" fill="none" stroke="#3a2c25" stroke-width="5"/><ellipse cx="110" cy="190" rx="90" ry="12" fill="#fff" stroke="#3a2c25" stroke-width="4"/>' },
+  parfait: { out: 'M54 24h112q-2 92-18 118q-12 20-38 20t-38-20q-16-26-18-118Z', inn: 'M60 30h100q-2 84-16 108q-10 18-34 18t-34-18q-14-24-16-108Z', top: 30, bot: 156, cap: 230, hl: 72, extra: '<path d="M104 162h12v28h-12Z" fill="#fff" stroke="#3a2c25" stroke-width="4"/><ellipse cx="110" cy="198" rx="42" ry="8" fill="#fff" stroke="#3a2c25" stroke-width="4"/>' },
   jug: { out: 'M62 52h84l14-10 4 6-10 12v118q0 22-22 22H84q-22 0-22-22Z', inn: 'M68 60h80v118q0 16-16 16H84q-16 0-16-16Z', top: 60, bot: 194, cap: 320, hl: 76, extra: '<path d="M62 80h-10q-14 0-14 20v30q0 18 14 18h10" fill="none" stroke="#3a2c25" stroke-width="5"/>' }
 };
 function orderKeys(b) { const am = b.added; const ks = b.seq.filter(k => am[k] > 0 && ING[k]); for (const k in am) if (am[k] > 0 && ING[k] && !ks.includes(k)) ks.push(k); return ks; }
@@ -123,7 +127,12 @@ function toppings(ks, surf, rimX, rimY) {
   const w = by('whip').length > 0;
   if (w) t += whipSVG(surf);
   by('scoop').forEach((k, i) => { t += scoopSVG((w ? 136 : 110) + i * 22, surf - (w ? 24 : 12) - i * 6, ING[k].color); });
-  by('blob').forEach((k, i) => { t += `<ellipse cx="${92 + i * 18}" cy="${surf - 5}" rx="10" ry="6" fill="${ING[k].color}" stroke="#3a2c25" stroke-width="2"/>`; });
+  // アイスがあるときは、その上にかける
+  const hasScoop = by('scoop').length > 0, sx = w ? 136 : 110, sy = surf - (w ? 24 : 12);
+  by('blob').forEach((k, i) => {
+    if (hasScoop) { for (let j = 0; j < 6; j++) t += `<circle cx="${sx - 10 + j * 4}" cy="${sy - 12 + (j % 2) * 4 + i * 3}" r="3.4" fill="${ING[k].color}" stroke="#3a2c25" stroke-width="1"/>`; }
+    else t += `<ellipse cx="${92 + i * 18}" cy="${surf - 5}" rx="10" ry="6" fill="${ING[k].color}" stroke="#3a2c25" stroke-width="2"/>`;
+  });
   by('slice').forEach((k, i) => { const c = ING[k].color; t += `<g transform="translate(${rimX - i * 24} ${rimY})"><circle r="15" fill="${c}" stroke="#3a2c25" stroke-width="3"/><circle r="10" fill="#fff" opacity=".55"/><path d="M0-10V10M-10 0H10M-7-7l14 14M7-7l-14 14" stroke="${c}" stroke-width="1.6"/></g>`; });
   return t;
 }
@@ -159,7 +168,7 @@ function dishSVG(b) {
 function plateSVG(b) {
   const ks = orderKeys(b), am = b.added;
   const big = b.cont === 'big';
-  let s = big ? `<ellipse cx="124" cy="184" rx="112" ry="30" fill="#fff" stroke="#3a2c25" stroke-width="4"/><ellipse cx="124" cy="181" rx="84" ry="19" fill="#f2ede4"/>`
+  let s = b.cont === 'tray' ? `<rect x="10" y="162" width="228" height="42" rx="16" fill="#fff" stroke="#3a2c25" stroke-width="4"/><rect x="26" y="170" width="196" height="24" rx="10" fill="#f2ede4"/>` : big ? `<ellipse cx="124" cy="184" rx="112" ry="30" fill="#fff" stroke="#3a2c25" stroke-width="4"/><ellipse cx="124" cy="181" rx="84" ry="19" fill="#f2ede4"/>`
     : `<ellipse cx="124" cy="182" rx="94" ry="26" fill="#fff" stroke="#3a2c25" stroke-width="4"/><ellipse cx="124" cy="179" rx="66" ry="15" fill="#f2ede4"/>`;
   const lay = ks.filter(k => ING[k].kind === 'layer');
   const reps = k => ING[k].vis === 'bread' ? Math.min(2, Math.max(1, Math.ceil(am[k]))) : 1;
@@ -180,7 +189,7 @@ function plateSVG(b) {
   });
   if (b.cuts && b.cuts.length && lay.length) s += `<text x="124" y="${Math.max(34, y - 8)}" text-anchor="middle" font-size="13" font-weight="800" fill="#3a2c25">カット済み ${b.cuts.length}本</text>`;
   s += heatLabel(b, 124, 18);
-  const pos = [[30, 150], [30, 96], [214, 108], [214, 152], [124, 40], [70, 40], [178, 40]];
+  const pos = b.cont === 'tray' ? [[42, 176], [206, 176], [42, 136], [206, 136], [124, 40], [70, 40], [178, 40]] : [[30, 150], [30, 96], [214, 108], [214, 152], [124, 40], [70, 40], [178, 40]];
   ks.filter(k => ING[k].kind === 'side').forEach((k, i) => {
     const [x, yy] = pos[i % pos.length], g = ING[k];
     if (g.vis === 'soup') s += `<path d="M${x - 18} ${yy - 10}h36l-4 22q-1 5-6 5h-16q-5 0-6-5Z" fill="#fff" stroke="#3a2c25" stroke-width="3"/><ellipse cx="${x}" cy="${yy - 8}" rx="15" ry="3.5" fill="${g.color}"/>`;
@@ -198,13 +207,14 @@ function heatLabel(b, x, y) {
 }
 function buildSVG(b, idp) {
   if (!b || !b.cont) return placeholderSVG();
-  if (b.cont === 'plate' || b.cont === 'big') return plateSVG(b);
+  if (FOOD_CONTS.includes(b.cont)) return plateSVG(b);
   if (b.cont === 'dish') return dishSVG(b);
   const key = contShape(b.cont);
   return GEO[key] ? drinkSVG(b, key, idp) : placeholderSVG();
 }
 function contIcon(id) {
   if (id === 'plate') return `<svg viewBox="0 0 220 220"><ellipse cx="110" cy="140" rx="86" ry="34" fill="#fff" stroke="#3a2c25" stroke-width="9"/><ellipse cx="110" cy="136" rx="54" ry="18" fill="#f2ede4"/></svg>`;
+  if (id === 'tray') return `<svg viewBox="0 0 220 220"><rect x="6" y="96" width="208" height="80" rx="22" fill="#fff" stroke="#3a2c25" stroke-width="9"/><rect x="32" y="116" width="156" height="40" rx="12" fill="#f2ede4"/></svg>`;
   if (id === 'big') return `<svg viewBox="0 0 220 220"><ellipse cx="110" cy="140" rx="106" ry="44" fill="#fff" stroke="#3a2c25" stroke-width="9"/><ellipse cx="110" cy="136" rx="70" ry="24" fill="#f2ede4"/></svg>`;
   if (id === 'dish') return `<svg viewBox="0 0 220 220"><ellipse cx="110" cy="150" rx="78" ry="26" fill="#fff" stroke="#3a2c25" stroke-width="9"/><path d="M84 146L96 100H124L136 146Z" fill="#f5c74e" stroke="#3a2c25" stroke-width="8"/></svg>`;
   const G = GEO[contShape(id)] || GEO.glass;

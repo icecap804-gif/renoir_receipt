@@ -5,7 +5,7 @@
   ・内容を変えたら version も別の文字(更新した日付など)に変えてください。
 */
 window.GAME_DATA = {
-  "version": "2026-10-19-5",
+  "version": "2026-10-19-6",
   "vessels": [
     {
       "name": "グラス",
@@ -346,6 +346,18 @@ window.GAME_DATA = {
       "icon": "can",
       "color": "#f6a35b",
       "unit": "",
+      "step": 5,
+      "once": true
+    },
+    "blueberry": {
+      "name": "ブルーベリー",
+      "cat": "drink",
+      "group": "トッピング",
+      "kind": "top",
+      "vis": "blob",
+      "icon": "round",
+      "color": "#4a4fa3",
+      "unit": "g",
       "step": 5,
       "once": true
     },
@@ -891,7 +903,8 @@ window.GAME_DATA = {
       "items": {
         "tea": null,
         "hotwater": 300
-      }
+      },
+      "container": "tea"
     },
     {
       "id": "icetea",
@@ -914,7 +927,8 @@ window.GAME_DATA = {
         "fruitmix": null,
         "lemonSlice": null
       },
-      "note": "カップにフルーツミックス50(1/2缶)とレモン1切れを入れます。"
+      "note": "カップにフルーツミックス50(1/2缶)とレモン1切れを入れます。",
+      "container": "tea"
     },
     {
       "id": "ifruittea",
@@ -1083,8 +1097,7 @@ window.GAME_DATA = {
         "whip": null,
         "matchaS": null
       },
-      "note": "最後に抹茶粉0.1をふりかけます。",
-      "container": "ame"
+      "note": "最後に抹茶粉0.1をふりかけます。"
     },
     {
       "id": "imatcha",
@@ -1101,13 +1114,14 @@ window.GAME_DATA = {
     },
     {
       "id": "jellyvanilla",
-      "name": "ゼリーバニラ",
+      "name": "カフェゼリー&バニラ",
       "cat": "drink",
       "look": "ice",
       "items": {
         "jelly": 130,
         "vanilla": null
-      }
+      },
+      "container": "parfait"
     },
     {
       "id": "jellyaulait",
@@ -1130,8 +1144,10 @@ window.GAME_DATA = {
         "berry": 50,
         "milk": 50,
         "yogurt": 50,
-        "vanilla": null
-      }
+        "vanilla": null,
+        "blueberry": null
+      },
+      "note": "バニラアイスの上に、さらにブルーベリー5gをかけます。"
     },
     {
       "id": "creamsoda",
@@ -1474,7 +1490,8 @@ window.GAME_DATA = {
         "モーニング用皿に、サラダ・スープ・トースト・ホワイトロースを置く",
         "ホワイトロースの横に、タマゴペースト(#18ディッシャーすりきり1杯)を乗せる"
       ],
-      "bake": "toast"
+      "bake": "toast",
+      "container": "tray"
     },
     {
       "id": "toast",
@@ -1800,7 +1817,8 @@ window.GAME_DATA = {
         "tomato": 0.5,
         "caesar": null,
         "cheesePowder": null
-      }
+      },
+      "container": "tray"
     },
     {
       "id": "hamburg",
@@ -1893,7 +1911,7 @@ window.GAME_DATA = {
         "scoreFirst": false,
         "lines": [
           {
-            "t": "cut",
+            "t": "score",
             "a": [
               0.06,
               0
@@ -1904,7 +1922,7 @@ window.GAME_DATA = {
             ]
           },
           {
-            "t": "cut",
+            "t": "score",
             "a": [
               0.94,
               0
